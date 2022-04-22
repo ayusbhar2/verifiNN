@@ -1,7 +1,7 @@
 import numpy as np
 
 layers = 4  # total layers
-neuron_layer = [1, 1, 1, 1]  # neurons per layer
+neuron_layer = [1, 1]  # neurons per layer
 
 
 def main():
