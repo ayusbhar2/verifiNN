@@ -1,6 +1,6 @@
 import numpy as np
 
-layers = 4  # total layers
+layers = 2  # total layers
 neuron_layer = [1, 1]  # neurons per layer
 
 
@@ -30,7 +30,7 @@ def compute_layer_output(neuron_count, input):
     layer_list = []
 
     for i in range(neuron_count):
-        layer_output = compute_neuron_output(input)
+        layer_output = compute_neuron_output(input) # pass a weights vector
         layer_list.append(layer_output)
 
     return np.array(layer_list)
