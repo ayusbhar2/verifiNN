@@ -9,7 +9,7 @@ def main():
     print(f"total layers: {num_layers}")
     print(f"input features : {num_features}")
 
-    input_data = get_training_data()
+    input_data = get_training_data(100, num_features)
     W = init_weights_network(num_layers, num_features)
 
     # following needs to be run a loop or matric multiplication - TODO
@@ -17,8 +17,8 @@ def main():
     print(f"output after 1 iteration: {output}")
 
 
-def get_training_data():
-    return np.random.randint(5, size=(1, num_features))
+def get_training_data(rows, columns):
+    return np.random.randint(5, size=(rows, columns))
 
 
 def init_weights_network(num_layers, num_features):
@@ -34,7 +34,7 @@ def init_weights_network(num_layers, num_features):
 
 
 def initialize_weights(num_neuron, num_features):
-    return np.random.randint(5, size=(num_neuron, num_features))
+    return np.random.uniform(0.0, 1.0, size=(num_neuron, num_features))
 
 
 def compute_nn_output_one_iteration(input_data, weight_list):
@@ -46,16 +46,49 @@ def compute_nn_output_one_iteration(input_data, weight_list):
 
 
 def compute_output(input_data, weight_list):
-    '''computes w1.w2..wn.(input_data)'''
-    output = input_data.transpose()
-    print(f"output: {output}")
+    '''computes wn.w(n-1)..w1.(input_data)'''
 
-    for W in weight_list:
-        print(f"computing dot of {output} with {W}")
-        output = W.dot(output)
-        print(f"output: {output}")
+    W = compute_weight_multiplication(weight_list=weight_list)
+    output = W.dot(input_data.T)
 
     return output
 
 
+def compute_weight_multiplication(weight_list):
+    '''computes wn.w(n-1)..w1, where w(i) is the weight matrix of ith layer'''
+
+    multiplied_weights = np.empty([2, 2])
+
+    size = len(weight_list)
+    for i in range(size-1, 0, -1):
+        if(i == size-1):
+            multiplied_weights = weight_list[i].dot(weight_list[i-1])
+        else:
+            print(
+                f"computing dot of {multiplied_weights} with {weight_list[i-1]}")
+            multiplied_weights = multiplied_weights.dot(weight_list[i-1])
+
+    print(f"final weights: {multiplied_weights}")
+    return multiplied_weights
+
+
+def compute_loss(y, z):
+    ''' computes the mean squared distances between 2 vectors (y and z) of equal dimensions (1xn)'''
+    x = y-z
+    print(f"y is: {y}")
+    print(f"z is: {z}")
+    print(f"x is: {x}")
+    squared_vector = np.square(x)
+    print(f"squared error is: {squared_vector}")
+    loss = squared_vector.sum(axis=1)
+    print(f"loss is {loss}")
+    return loss
+
+
 main()
+
+
+# Tests
+y = np.random.randint(10, size=(2, 5))
+z = np.random.randint(10, size=(2, 5))
+compute_loss(y, z)
