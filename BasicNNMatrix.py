@@ -12,9 +12,8 @@ def main():
     input_data = get_training_data(100, num_features)
     W = init_weights_network(num_layers, num_features)
 
-    # following needs to be run a loop or matric multiplication - TODO
-    output = compute_nn_output_one_iteration(input_data, W)
-    print(f"output after 1 iteration: {output}")
+    output = compute_nn_output_one_epic(input_data, W)
+    print(f"output after 1 epic: {output}")
 
 
 def get_training_data(rows, columns):
@@ -37,7 +36,7 @@ def initialize_weights(num_neuron, num_features):
     return np.random.uniform(0.0, 1.0, size=(num_neuron, num_features))
 
 
-def compute_nn_output_one_iteration(input_data, weight_list):
+def compute_nn_output_one_epic(input_data, weight_list):
     '''computes and returns y for single data point'''
     print(f"starting nn for 1 iteration with input {input_data}")
     print(f"weights:{weight_list}")
