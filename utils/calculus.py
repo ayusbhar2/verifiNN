@@ -1,4 +1,4 @@
-
+import numpy as np
 
 def differentiate(f, a, k=1, h=.0001):
 	"""Numerically find the value of the kth derivative of f at a.
@@ -11,9 +11,17 @@ def differentiate(f, a, k=1, h=.0001):
 	Returns:
 	    f^(k)(a)
 	"""
-	# assumes func has a derivative or the order
-	q = (f(a+h) - f(a-h))/(2*h)
-	return q
+	# assumes derivative exists
+	n = len(a)
+	grad = np.zeros(n)
+	for i in range(n):
+		v = np.zeros(n)
+		v[i] = h
+		a_r = a + v
+		a_l = a - v
+		q = (f(a_r) - f(a_l))/(2*h)
+		grad[i] = q
+	return grad
 
 
 
