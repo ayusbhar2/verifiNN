@@ -1,5 +1,7 @@
 import numpy as np
 
+np.random.seed(1234)
+
 num_layers = 4  # total layers
 num_features = 2  # total features
 
