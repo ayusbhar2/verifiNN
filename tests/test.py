@@ -1,7 +1,7 @@
 import numpy as np
 import unittest
 
-from utils import calculus
+from utils import calculus, network
 
 tol = 0.000001	# tol = O(h^2)
 
@@ -53,6 +53,20 @@ class TestCalculusMethods(unittest.TestCase):
 		self.assertAlmostEqual(H_expt[0,1], H_actual[0, 1], delta=tol)
 		self.assertAlmostEqual(H_expt[1,0], H_actual[1, 0], delta=tol)
 		self.assertAlmostEqual(H_expt[1,1], H_actual[1, 1], delta=tol)
+
+
+class TestNetworksMethods(unittest.TestCase):
+
+	def test_generate_network_specs(self):
+		arch = network.generate_network_specs(4, 3, 2, 2)
+		self.assertEqual(arch, [(2, 4), (2, 2), (3, 2)])
+
+
+	def test_initialize_network(self):
+		ntwk = network.initialize_network([(2, 4), (2, 2), (3, 2)])
+		self.assertEqual(ntwk[0].shape, (2, 4))
+		self.assertEqual(ntwk[1].shape, (2, 2))
+		self.assertEqual(ntwk[2].shape, (3, 2))
 
 
 
