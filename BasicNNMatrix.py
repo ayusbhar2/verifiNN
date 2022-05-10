@@ -1,12 +1,8 @@
 import numpy as np
 
-<<<<<<< HEAD
-num_layers = 2  # total layers
-=======
 np.random.seed(1234)
 
 num_layers = 4  # total layers
->>>>>>> 714f74afed91f627e993a425e5640dbd64a48746
 num_features = 2  # total features
 
 
