@@ -1,41 +1,68 @@
 import numpy as np
 
+from utils import calculus, network, numpyutils
+
 np.random.seed(1234)
 
 num_layers = 4  # total layers
-num_features = 2  # total features
+dx = 2  # total features
+dz = 1  # output vector size
+di = 2  # neurons in each layer
+H = 1  # number of hidden layers
+num_data = 2
+
+arch = network.generate_network_specs(dx, dz, di, H)
+
+# TODO - get input data and z (labels) from the Data class
+
+input_data = numpyutils.get_random_data(1, dx)
+z = numpyutils.get_random_data(num_data, dz)
 
 
 def main():
     print("starting basic neural network training")
-    print(f"total layers: {num_layers}")
-    print(f"input features : {num_features}")
+    print(f"total layers: {H+1}")
+    print(f"input features : {dx}")
+    print(f"neurons in each hidden layer : {di}")
+    print(f"dimensions of output : {dz}")
 
-    input_data = get_training_data(1, num_features)
-    W_list = init_weights_network(num_layers, num_features)
+    w_list = network.initialize_network(arch)
+    w_vector = unpack_weights(w_list)
+    loss = compute_loss(w_vector)
+    print(f"loss after 1 iteration: {loss}")
 
-    output = compute_output(input_data, W_list)
-    print(f"output after 1 epic: {output}")
-
-
-def get_training_data(rows, columns):
-    return np.random.randint(5, size=(rows, columns))
-
-
-def init_weights_network(num_layers, num_features):
-    '''initializes weights for the whole network and returns a list of weight matrix'''
-    W = []
-    for i in range(num_layers-1):
-        # fully connected
-        W.append(initialize_weights(num_features, num_features))
-
-    # last layer - assuming scalar output per iteration
-    W.append(initialize_weights(1, num_features))
-    return W
+    gradient_vector = calculus.differentiate(compute_loss, w_vector)
+    print(f"gradient at end of 1 iteration: {gradient_vector}")
+    # while(gradient_vector!)
 
 
-def initialize_weights(num_neuron, num_features):
-    return np.random.uniform(0.0, 1.0, size=(num_neuron, num_features))
+def unpack_weights(W_List):
+    '''returns a 1D array by unpacking all weights in the weight list'''
+
+    flat_list = [w.ravel() for w in W_List]
+    unpacked_array = np.concatenate(flat_list, axis=0)
+    return unpacked_array
+
+
+def pack_weights(w_vector, arch):
+    '''returns a weight list array by packing all weights in the weight list according to their shape'''
+
+    weight_list = []
+    i = 0
+    #print(f"arch: {arch}")
+    #print(f"W_Vector: {w_vector}")
+    for shape in arch:
+        size = shape[0]*shape[1]
+        w = w_vector[i:size+i]
+        #print(f"w: {w}")
+        w_reshaped = w.reshape(shape[0], shape[1])
+        #print(f"w_reshaped: {w_reshaped}")
+        weight_list.append(w_reshaped)
+        i = size
+
+    print(f"final packed list: {weight_list}")
+
+    return weight_list
 
 
 def compute_output(input_data, weight_list):
@@ -69,7 +96,7 @@ def compute_weight_multiplication(weight_list):
     return W
 
 
-def compute_loss(y, z):
+def compute_loss_vector(y, z):
     ''' computes the mean squared distances between 2 vectors (y and z) of equal dimensions (1xn)'''
     x = y-z
     print(f"y is: {y}")
@@ -82,10 +109,18 @@ def compute_loss(y, z):
     return loss
 
 
+def compute_loss(weights_vector):
+    ''' computes the value of loss function at a given point determined by the weights_vector'''
+
+    W_list = pack_weights(w_vector=weights_vector, arch=arch)
+    y = compute_output(input_data, W_list)
+    return compute_loss_vector(y, z)
+
+
 main()
 
 
 # Tests
-y = np.random.randint(10, size=(2, 5))
-z = np.random.randint(10, size=(2, 5))
-compute_loss(y, z)
+#y = np.random.randint(10, size=(2, 5))
+#z = np.random.randint(10, size=(2, 5))
+#compute_loss(y, z)
