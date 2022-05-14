@@ -37,3 +37,26 @@ def initialize_network(network_specs):
         W = np.random.rand(dims[0], dims[1])
         network.append(W)
     return network
+
+
+def unpack_weights(W_List):
+    '''Returns a 1D array by unpacking all weights in the weight list'''
+    flat_list = [w.ravel() for w in W_List]
+    unpacked_array = np.concatenate(flat_list, axis=0)
+    return unpacked_array
+
+
+def pack_weights(w_vector, arch):
+    '''Creates a list of weight matrices form a weights vector accordig to arch.'''
+
+    weight_list = []
+    i = 0
+
+    for shape in arch:
+        size = shape[0]*shape[1]
+        w = w_vector[i:size+i]
+        w_reshaped = w.reshape(shape[0], shape[1])
+        weight_list.append(w_reshaped)
+        i = size
+
+    return weight_list

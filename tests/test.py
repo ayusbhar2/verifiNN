@@ -55,18 +55,40 @@ class TestCalculusMethods(unittest.TestCase):
 		self.assertAlmostEqual(H_expt[1,1], H_actual[1, 1], delta=tol)
 
 
-class TestNetworksMethods(unittest.TestCase):
+class TestNetworkMethods(unittest.TestCase):
 
 	def test_generate_network_specs(self):
 		arch = network.generate_network_specs(4, 3, 2, 2)
+		# print(arch)
+
 		self.assertEqual(arch, [(2, 4), (2, 2), (3, 2)])
 
 
 	def test_initialize_network(self):
 		ntwk = network.initialize_network([(2, 4), (2, 2), (3, 2)])
+		# print(ntwk)
 		self.assertEqual(ntwk[0].shape, (2, 4))
 		self.assertEqual(ntwk[1].shape, (2, 2))
 		self.assertEqual(ntwk[2].shape, (3, 2))
+
+	def test_unpack_weights(self):
+		W1 = np.array([[1, 2], [3, 4]])
+		W2 = np.array([[5, 6], [7, 8]])
+		W_list = [W1, W2]
+		w = network.unpack_weights(W_list)
+		self.assertTrue((w==[1, 2, 3, 4, 5, 6, 7, 8]).all())
+
+	def test_pack_weights(self):
+		w = np.array([1, 2, 3, 4, 5, 6, 7, 8])
+		W_list = network.pack_weights(w, [(2, 2), (2, 2)])
+		self.assertTrue(
+			(W_list[0]==np.array([[1, 2], [3, 4]])).all()
+		)
+		self.assertTrue(
+			(W_list[1]==np.array([[5, 6], [7, 8]])).all()
+		)
+
+
 
 
 
