@@ -2,7 +2,6 @@ import numpy as np
 
 from utils import calculus, network, numpyutils
 
-
 np.random.seed(1234)
 
 num_layers = 4  # total layers
@@ -29,12 +28,14 @@ def main():
 
     w_list = network.initialize_network(arch)
     w_vector = network.unpack_weights(w_list)
-    loss = compute_loss(w_vector)
+    #loss = compute_loss(w_vector)
     # print(f"loss after 1 iteration: {loss}")
 
-    gradient_vector = calculus.differentiate(compute_loss, w_vector)
+    #gradient_vector = calculus.differentiate(compute_loss, w_vector)
     # print(f"gradient at end of 1 iteration: {gradient_vector}")
     # while(gradient_vector!)
+
+    gradient_descent(weights_vector=w_vector)
 
 
 def compute_output(input_data, weight_list):
@@ -87,6 +88,28 @@ def compute_loss(weights_vector):
     W_list = network.pack_weights(w_vector=weights_vector, arch=arch)
     y = compute_output(input_data, W_list)
     return compute_loss_vector(y, z)
+
+
+def gradient_descent(weights_vector):
+    print(f"initial weights are: {weights_vector}")
+    e_t = 0.001  # error thrershold
+    alpha = 0.01  # learning rate
+    max_iterations = 100000
+
+    loss = compute_loss(weights_vector=weights_vector)
+    print(f"initial loss is: {loss}")
+
+    i = 0
+    while(loss > e_t and i < max_iterations):
+        gradient_vector = calculus.differentiate(compute_loss, weights_vector)
+        weights_vector = weights_vector - alpha*gradient_vector
+        loss = compute_loss(weights_vector=weights_vector)
+        i = i+1
+
+    print(f"final weights are: {weights_vector}")
+    print(f"total iterations: {i}")
+    print(f"final loss is: {loss}")
+    return weights_vector
 
 
 main()
