@@ -15,8 +15,12 @@ arch = network.generate_network_specs(dx, dz, di, H)
 
 # TODO - get input data and z (labels) from the Data class
 
-input_data = numpyutils.get_random_data(1, dx)
-z = numpyutils.get_random_data(num_data, dz)
+#input_data = numpyutils.get_random_data(1, dx)
+input_data = np.array([0.53436063, 0.31448347])
+# TODO num_data - not needed and rename it
+#z = numpyutils.get_random_data(num_data, dz)
+z = np.array([[0.18450251],
+              [0.28731715]])
 
 
 def main():
@@ -82,6 +86,7 @@ def compute_loss_vector(y, z):
     return loss
 
 
+# TODO - make it accept an argument that determines what type of loss to compute
 def compute_loss(weights_vector):
     ''' computes the value of loss function at a given point determined by the weights_vector'''
 
@@ -93,22 +98,32 @@ def compute_loss(weights_vector):
 def gradient_descent(weights_vector):
     print(f"initial weights are: {weights_vector}")
     e_t = 0.001  # error thrershold
-    alpha = 0.01  # learning rate
-    max_iterations = 100000
+    alpha = 0.05  # learning rate
+    max_iterations = 100
 
+    gradient_vector = calculus.differentiate(compute_loss, weights_vector)
+    norm = np.linalg.norm(gradient_vector)
     loss = compute_loss(weights_vector=weights_vector)
+    print(f"initial norm is: {norm}")
     print(f"initial loss is: {loss}")
 
     i = 0
-    while(loss > e_t and i < max_iterations):
-        gradient_vector = calculus.differentiate(compute_loss, weights_vector)
+    while(norm > e_t and i < max_iterations):
         weights_vector = weights_vector - alpha*gradient_vector
+        gradient_vector = calculus.differentiate(compute_loss, weights_vector)
+        # compute magnitude of gradient vector
+        norm = np.linalg.norm(gradient_vector)
+        # compare this magnitude with e_t
         loss = compute_loss(weights_vector=weights_vector)
         i = i+1
+
+        print(f"loss is: {loss}")
+        print(f"norm is: {norm}")
 
     print(f"final weights are: {weights_vector}")
     print(f"total iterations: {i}")
     print(f"final loss is: {loss}")
+    print(f"final norm is: {norm}")
     return weights_vector
 
 
