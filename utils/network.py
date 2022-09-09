@@ -34,7 +34,7 @@ def initialize_network(network_specs):
     """Generate random weight matrices from network_specs."""
     network = []
     for dims in network_specs:
-        W = np.random.rand(dims[0], dims[1])
+        W = np.random.rand(dims[0], dims[1]) + 5
         network.append(W)
     return network
 

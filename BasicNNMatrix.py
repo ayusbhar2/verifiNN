@@ -2,7 +2,7 @@ import numpy as np
 
 from utils import calculus, network, numpyutils
 
-np.random.seed(1234)
+# np.random.seed(1234)
 
 num_layers = 4  # total layers
 dx = 2  # total features
@@ -98,8 +98,8 @@ def compute_loss(weights_vector):
 def gradient_descent(weights_vector):
     print(f"initial weights are: {weights_vector}")
     e_t = 0.001  # error thrershold
-    alpha = 0.05  # learning rate
-    max_iterations = 100
+    alpha = 0.0005  # learning rate
+    max_iterations = 500
 
     gradient_vector = calculus.differentiate(compute_loss, weights_vector)
     norm = np.linalg.norm(gradient_vector)
