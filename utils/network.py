@@ -1,7 +1,7 @@
 
 import numpy as np
 
-# TODO: maybe we can create an `Network` class later.
+from utils import commonutils
 
 
 class Network:
@@ -40,30 +40,17 @@ class Network:
             i += 1
         return self.network_specs
 
-    def initialize_network(self):
+    def initialize_network(self, start=0):
         """Generate random weight matrices from network_specs."""
         for dims in self.network_specs:
-            W = np.random.rand(dims[0], dims[1])
+            W = np.random.rand(dims[0], dims[1]) + start
             self.network.append(W)
         return self.network
 
     def unpack_weights(self, W_List):
         '''Returns a 1D array by unpacking all weights in the weight list'''
-        flat_list = [w.ravel() for w in W_List]
-        unpacked_array = np.concatenate(flat_list, axis=0)
-        return unpacked_array
+        return commonutils.unpack_weights(W_List=W_List)
 
     def pack_weights(self, w_vector):
         '''Creates a list of weight matrices form a weights vector accordig to arch.'''
-
-        weight_list = []
-        i = 0
-
-        for shape in self.network_specs:
-            size = shape[0]*shape[1]
-            w = w_vector[i:size+i]
-            w_reshaped = w.reshape(shape[0], shape[1])
-            weight_list.append(w_reshaped)
-            i = size
-
-        return weight_list
+        return commonutils.pack_weights(w_vector=w_vector, list_shape_tuple=self.network_specs)
