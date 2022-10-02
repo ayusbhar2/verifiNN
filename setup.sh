@@ -1,6 +1,6 @@
 #! bin/bash
 
-virtualenv -p python3 ./venv
+virtualenv -p /usr/bin/python3 ./venv
 
 . ./venv/bin/activate
 

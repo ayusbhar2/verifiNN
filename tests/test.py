@@ -1,7 +1,8 @@
-import numpy as np
 import unittest
 
-from utils import calculus, network
+import numpy as np
+from utils import calculus, commonutils
+from utils.network import Network
 
 tol = 0.000001	# tol = O(h^2)
 
@@ -58,14 +59,17 @@ class TestCalculusMethods(unittest.TestCase):
 class TestNetworkMethods(unittest.TestCase):
 
 	def test_generate_network_specs(self):
-		arch = network.generate_network_specs(4, 3, 2, 2)
+		network = Network(4, 3, 2, 2)
+		arch = network.generate_network_specs()
 		# print(arch)
 
 		self.assertEqual(arch, [(2, 4), (2, 2), (3, 2)])
 
 
 	def test_initialize_network(self):
-		ntwk = network.initialize_network([(2, 4), (2, 2), (3, 2)])
+		network = Network(4, 3, 2, 2)
+		network.generate_network_specs()
+		ntwk = network.initialize_network()
 		# print(ntwk)
 		self.assertEqual(ntwk[0].shape, (2, 4))
 		self.assertEqual(ntwk[1].shape, (2, 2))
@@ -75,18 +79,21 @@ class TestNetworkMethods(unittest.TestCase):
 		W1 = np.array([[1, 2], [3, 4]])
 		W2 = np.array([[5, 6], [7, 8]])
 		W_list = [W1, W2]
-		w = network.unpack_weights(W_list)
+		w = commonutils.unpack_weights(W_list)
 		self.assertTrue((w==[1, 2, 3, 4, 5, 6, 7, 8]).all())
 
 	def test_pack_weights(self):
 		w = np.array([1, 2, 3, 4, 5, 6, 7, 8])
-		W_list = network.pack_weights(w, [(2, 2), (2, 2)])
+		W_list = commonutils.pack_weights(w, [(2, 2), (2, 2)])
 		self.assertTrue(
 			(W_list[0]==np.array([[1, 2], [3, 4]])).all()
 		)
 		self.assertTrue(
 			(W_list[1]==np.array([[5, 6], [7, 8]])).all()
 		)
+
+		
+
 
 
 
