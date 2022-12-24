@@ -2,9 +2,10 @@
 import numpy as np
 
 from utils import commonutils
+from utils.model import Model
 
 
-class Network:
+class Network(Model):
 
     def __init__(self, dx, dz, di, H):
 
@@ -14,6 +15,14 @@ class Network:
         self.H = H
         self.network_specs = []
         self.network = []
+        self.trained = False;
+
+    def initialize(self, start=0):
+        self.generate_network_specs()
+        w_list = self.initialize_network(start)
+        self.initial_weights = self.unpack_weights(w_list)
+        return self.initial_weights
+
 
     def generate_network_specs(self):
         """Generate a list of tuples contianing matrix dimensions.
@@ -47,6 +56,14 @@ class Network:
             self.network.append(W)
         return self.network
 
+    def compute_loss(self,weights_vector, input_data, z):
+        ''' computes the value of loss function at a given point determined by the weights_vector'''
+        W_list = commonutils.pack_weights(
+            w_vector=weights_vector, list_shape_tuple=self.network_specs)
+        y = self.get_output(input_data, W_list)
+        #print(f"output: {y} ")
+        return commonutils.mean_square_distance(y, z)
+
     def unpack_weights(self, W_List):
         '''Returns a 1D array by unpacking all weights in the weight list'''
         return commonutils.unpack_weights(W_List=W_List)
@@ -54,3 +71,40 @@ class Network:
     def pack_weights(self, w_vector):
         '''Creates a list of weight matrices form a weights vector accordig to arch.'''
         return commonutils.pack_weights(w_vector=w_vector, list_shape_tuple=self.network_specs)
+
+    def get_output(self,input_data, weight_list):
+        '''computes wn.w(n-1)..w1.(input_data)'''
+        '''computes and returns y for single data point'''
+
+        # print(f"starting nn for 1 iteration with input {input_data}")
+        # print(f"weights:{weight_list}")
+
+        W = self.compute_weight_multiplication(weight_list=weight_list)
+        output = W.dot(input_data.T)
+
+        return output
+
+    def get_trained_output(self, input_data):
+        # TODO - to be implemented
+        return super().get_trained_output(input_data)
+
+    def is_trained(self):
+        return self.trained;
+
+
+    def compute_weight_multiplication(self,weight_list):
+        '''computes wn.w(n-1)..w1, where w(i) is the weight matrix of ith layer'''
+
+        W = np.empty([2, 2])  # TODO - any other way to initialize?
+
+        size = len(weight_list)
+        for i in range(size-1, 0, -1):
+            if(i == size-1):
+                W = weight_list[i].dot(weight_list[i-1])
+            else:
+                W = W.dot(weight_list[i-1])
+
+        # print(f"final weights: {W}")
+        return W
+
+
