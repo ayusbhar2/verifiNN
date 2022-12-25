@@ -14,7 +14,7 @@ class LinearRegression(Model):
         self.trained = False
 
     def initialize(self, start = 0):
-        return self.initialize_weights(self, start)
+        return self.initialize_weights(start)
 
     def is_trained(self):
         return self.trained
