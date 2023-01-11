@@ -1,6 +1,6 @@
 # verifiNN
 
-This project implements a semi-definite programming (SDP) based verification algorithm for Deep Neural Networks from the ground up.
+This project implements the training of deep linear networks from the ground up. We also intend to use it in investigating the loss landscape of deep linear networks and comparing it with other learning models, e.g. linear rigression. We hope to publish the results of our learing in the forrm of blog posts.
 
 Prerequisites:
 - python 3
