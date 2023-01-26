@@ -22,3 +22,10 @@ def pack_weights(w_vector, list_shape_tuple):
         i = size
 
     return weight_list
+
+def mean_square_distance(y, z):
+    ''' computes the mean squared distances between 2 vectors (y and z) of equal dimensions (1xn)'''
+    x = y-z
+    squared_vector = np.square(x)
+    loss = squared_vector.sum()
+    return loss
