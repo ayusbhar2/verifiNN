@@ -1,8 +1,8 @@
 import unittest
 
 import numpy as np
-from utils import calculus, commonutils
-from utils.network import Network
+from src.utils import calculus, commonutils
+from src.utils.network import Network
 
 tol = 0.000001	# tol = O(h^2)
 

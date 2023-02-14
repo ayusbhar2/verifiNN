@@ -2,7 +2,7 @@ from functools import partial
 
 import numpy as np
 
-from utils import calculus
+from src.utils import calculus
 
 
 def gradient_descent(weights_vector, m_input_data, m_z, model, e_t=0.001, alpha=0.05, max_iterations=100, verbose=False):

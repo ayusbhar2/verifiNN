@@ -4,3 +4,4 @@ venv/
 .ipynb_checkpoints/
 *.ipynb
 packaging_tutorial/
+.DS_Store
