@@ -6,3 +6,6 @@ venv/
 packaging_tutorial/
 .DS_Store
 */requirements.txt
+build/
+dist/
+src/verifiNN.egg-info/
