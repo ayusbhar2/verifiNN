@@ -5,7 +5,7 @@ venv/
 *.ipynb
 packaging_tutorial/
 .DS_Store
-*/requirements.txt
+requirements.txt
 build/
 dist/
 src/verifiNN.egg-info/
