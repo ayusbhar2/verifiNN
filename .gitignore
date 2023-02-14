@@ -5,3 +5,4 @@ venv/
 *.ipynb
 packaging_tutorial/
 .DS_Store
+*/requirements.txt
