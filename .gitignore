@@ -1,11 +1,6 @@
 venv/
 *.pyc
 */__pycache__/
-.ipynb_checkpoints/
-*.ipynb
-packaging_tutorial/
-.DS_Store
-requirements.txt
 build/
 dist/
-src/verifiNN.egg-info/
+verifiNN/verifiNN.egg-info/

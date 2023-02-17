@@ -10,7 +10,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="verifiNN",  # Required
-    version="0.0.0.dev2",  # Required
+    version="0.0.0.dev4",  # Required
     description="A package for optimization based neural network verification.",  # Optional
     long_description=long_description,  # Optional
     long_description_content_type="text/markdown",  # Optional
@@ -25,7 +25,7 @@ setup(
     ],
     keywords="neural networks, verification, convex optimization, semidefinit programming",  # Optional
     package_dir={"": "verifiNN"},  # Optional
-    packages=find_packages(where="verifiNN"),  # Required
+    packages=find_packages(include="verifiNN", exclude=["tests"]),  # Required
     python_requires=">=3.7, <4",
     install_requires=[
         "numpy == 1.21.5",
