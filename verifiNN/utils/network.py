@@ -1,8 +1,8 @@
 
 import numpy as np
 
-from src.utils import commonutils
-from src.utils.model import Model
+from utils import commonutils
+from utils.model import Model
 
 
 class Network(Model):
