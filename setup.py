@@ -14,7 +14,7 @@ setup(
     description="A package for optimization based neural network verification.",  # Optional
     long_description=long_description,  # Optional
     long_description_content_type="text/markdown",  # Optional
-    url="https://github.com/harshgit/verifiNN",  # Optional
+    url="https://github.com/harshgit/verifiNN/tree/ayush_packaging",  # Optional
     author="Ayush Bharadwaj",  # Optional
     author_email="ayush.bharadwaj@gmail.com",  # Optional
     classifiers=[  # Optional
@@ -25,7 +25,7 @@ setup(
     ],
     keywords="neural networks, verification, convex optimization, semidefinit programming",  # Optional
     package_dir={"": "verifiNN"},  # Optional
-    packages=find_packages(include="verifiNN", exclude=["tests"]),  # Required
+    packages=find_packages(include="verifiNN", exclude="tests"),  # Required
     python_requires=">=3.7, <4",
     install_requires=[
         "numpy == 1.21.5",
