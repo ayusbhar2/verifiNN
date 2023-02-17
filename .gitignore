@@ -4,3 +4,4 @@ venv/
 build/
 dist/
 verifiNN/verifiNN.egg-info/
+.DS_Store
