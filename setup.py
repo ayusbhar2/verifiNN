@@ -10,7 +10,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 
 setup(
     name="verifiNN",  # Required
-    version="0.0.0.dev4",  # Required
+    version="0.0.0.dev5",  # Required
     description="A package for optimization based neural network verification.",  # Optional
     long_description=long_description,  # Optional
     long_description_content_type="text/markdown",  # Optional
