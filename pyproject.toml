@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "verifiNN"
-version = "0.0.0.dev5"
+version = "0.0.0.dev6"
 description="A package for optimization based neural network verification."
 authors = [
   {name = "Ayush Bharadwaj", email = "ayush.bharadwaj@gmail.com"},
