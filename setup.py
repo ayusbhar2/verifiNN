@@ -24,8 +24,8 @@ setup(
         "Programming Language :: Python :: 3.7"
     ],
     keywords="neural networks, verification, convex optimization, semidefinit programming",  # Optional
-    package_dir={"": "src"},  # Optional
-    packages=find_packages(where="src"),  # Required
+    package_dir={"": "verifiNN"},  # Optional
+    packages=find_packages(where="verifiNN"),  # Required
     python_requires=">=3.7, <4",
     install_requires=[
         "numpy == 1.21.5",
