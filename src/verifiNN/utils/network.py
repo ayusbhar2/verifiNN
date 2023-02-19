@@ -1,8 +1,8 @@
 
 import numpy as np
 
-from utils import commonutils
-from utils.model import Model
+from verifiNN.utils import commonutils
+from verifiNN.utils.model import Model
 
 
 class Network(Model):

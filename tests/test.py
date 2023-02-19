@@ -1,8 +1,8 @@
 import unittest
 
 import numpy as np
-from src.utils import calculus, commonutils
-from src.utils.network import Network
+from verifiNN.utils import calculus, commonutils
+from verifiNN.utils.network import Network
 
 tol = 0.000001	# tol = O(h^2)
 
@@ -91,10 +91,6 @@ class TestNetworkMethods(unittest.TestCase):
 		self.assertTrue(
 			(W_list[1]==np.array([[5, 6], [7, 8]])).all()
 		)
-
-		
-
-
 
 
 
