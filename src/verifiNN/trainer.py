@@ -1,4 +1,4 @@
-from utils.model import Model
+from verifiNN.models.model import Model
 
 
 class TrainingTask:
@@ -12,12 +12,13 @@ class TrainingTask:
 
         self.initial_weights = self.model.initialize(weight_start)
 
-    def start_training(self, algorithm_function, e_t=0.001, alpha=0.05, max_iterations=100, verbose=False):
+    def start_training(self, algorithm_function, e_t=0.001, alpha=0.05,
+        max_iterations=100, verbose=False):
 
-        print("\n\n")
-        print(f"------------ start training -------------------- ")
-        print(f"start training with algorithm function: {algorithm_function}")
+        # print("\n\n")
+        # print(f"------------ start training -------------------- ")
+        # print(f"start training with algorithm function: {algorithm_function}")
         training_output = algorithm_function(self.initial_weights, self.input_data,
                            self.z, self.model, e_t, alpha, max_iterations,verbose)
-        print(f"------------ end training ---------------------- ")
+        # print(f"------------ end training ---------------------- ")
         return training_output

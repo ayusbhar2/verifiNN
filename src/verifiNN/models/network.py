@@ -1,8 +1,8 @@
 
 import numpy as np
 
-from verifiNN.utils import commonutils
-from verifiNN.utils.model import Model
+from verifiNN.utils import common_utils
+from verifiNN.models.model import Model
 
 
 class Network(Model):
@@ -30,7 +30,7 @@ class Network(Model):
         Args:
                 dx (Int): length of the input vector
                 dz (Int): length of output vector
-                di (Int): number of neurons in each hiddeen layer
+                di (Int): number of neurons in each hidden layer
                 H (Int): number of hidden layers (excluding the output layer)
         Returns:
                 network_specs (list of tuples): each entry in network_specs is
@@ -58,19 +58,19 @@ class Network(Model):
 
     def compute_loss(self,weights_vector, input_data, z):
         ''' computes the value of loss function at a given point determined by the weights_vector'''
-        W_list = commonutils.pack_weights(
+        W_list = common_utils.pack_weights(
             w_vector=weights_vector, list_shape_tuple=self.network_specs)
         y = self.get_output(input_data, W_list)
         #print(f"output: {y} ")
-        return commonutils.mean_square_distance(y, z)
+        return common_utils.mean_square_distance(y, z)
 
     def unpack_weights(self, W_List):
         '''Returns a 1D array by unpacking all weights in the weight list'''
-        return commonutils.unpack_weights(W_List=W_List)
+        return common_utils.unpack_weights(W_List=W_List)
 
     def pack_weights(self, w_vector):
         '''Creates a list of weight matrices form a weights vector accordig to arch.'''
-        return commonutils.pack_weights(w_vector=w_vector, list_shape_tuple=self.network_specs)
+        return common_utils.pack_weights(w_vector=w_vector, list_shape_tuple=self.network_specs)
 
     def get_output(self,input_data, weight_list):
         '''computes wn.w(n-1)..w1.(input_data)'''

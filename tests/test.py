@@ -1,10 +1,54 @@
 import unittest
 
 import numpy as np
-from verifiNN.utils import calculus, commonutils
-from verifiNN.utils.network import Network
+
+from verifiNN.algorithms.algorithm import gradient_descent
+from verifiNN.models.network import Network
+from verifiNN.trainer import TrainingTask
+from verifiNN.utils import calculus, common_utils
 
 tol = 0.000001	# tol = O(h^2)
+
+
+class TestAlgorithm(unittest.TestCase):
+
+
+	def test_gradient_descent(self):
+		network = Network(4, 3, 2, 2)
+		network.generate_network_specs()
+		end_point, grad_norm = gradient_descent(
+			weights_vector=np.ones(18),
+			m_input_data=np.array([1, 2, 3, 4]),
+			m_z=np.array([1, 1, 1]),
+			model=network,
+			e_t=0.001,
+			alpha=0.05,
+			max_iterations=2,
+			verbose=True,
+		)
+		assert grad_norm==0.0
+
+
+class TestNetwork(unittest.TestCase):
+
+
+	def test_generate_network_specs(self):
+		network = Network(4, 3, 2, 2)
+		arch = network.generate_network_specs()
+		# print(arch)
+
+		self.assertEqual(arch, [(2, 4), (2, 2), (3, 2)])
+
+
+	def test_initialize_network(self):
+		network = Network(4, 3, 2, 2)
+		network.generate_network_specs()
+		ntwk = network.initialize_network()
+		# print(ntwk)
+		self.assertEqual(ntwk[0].shape, (2, 4))
+		self.assertEqual(ntwk[1].shape, (2, 2))
+		self.assertEqual(ntwk[2].shape, (3, 2))
+
 
 class TestCalculusMethods(unittest.TestCase):
 
@@ -56,35 +100,17 @@ class TestCalculusMethods(unittest.TestCase):
 		self.assertAlmostEqual(H_expt[1,1], H_actual[1, 1], delta=tol)
 
 
-class TestNetworkMethods(unittest.TestCase):
-
-	def test_generate_network_specs(self):
-		network = Network(4, 3, 2, 2)
-		arch = network.generate_network_specs()
-		# print(arch)
-
-		self.assertEqual(arch, [(2, 4), (2, 2), (3, 2)])
-
-
-	def test_initialize_network(self):
-		network = Network(4, 3, 2, 2)
-		network.generate_network_specs()
-		ntwk = network.initialize_network()
-		# print(ntwk)
-		self.assertEqual(ntwk[0].shape, (2, 4))
-		self.assertEqual(ntwk[1].shape, (2, 2))
-		self.assertEqual(ntwk[2].shape, (3, 2))
-
+class TestCommonUtils(unittest.TestCase):
 	def test_unpack_weights(self):
 		W1 = np.array([[1, 2], [3, 4]])
 		W2 = np.array([[5, 6], [7, 8]])
 		W_list = [W1, W2]
-		w = commonutils.unpack_weights(W_list)
+		w = common_utils.unpack_weights(W_list)
 		self.assertTrue((w==[1, 2, 3, 4, 5, 6, 7, 8]).all())
 
 	def test_pack_weights(self):
 		w = np.array([1, 2, 3, 4, 5, 6, 7, 8])
-		W_list = commonutils.pack_weights(w, [(2, 2), (2, 2)])
+		W_list = common_utils.pack_weights(w, [(2, 2), (2, 2)])
 		self.assertTrue(
 			(W_list[0]==np.array([[1, 2], [3, 4]])).all()
 		)
@@ -92,6 +118,50 @@ class TestNetworkMethods(unittest.TestCase):
 			(W_list[1]==np.array([[5, 6], [7, 8]])).all()
 		)
 
+
+class TestController(unittest.TestCase):
+	def test_single_data_origin(self):
+		# print("starting test --- test_single_data_origin")
+		dx = 2  # total features
+		dz = 1  # output vector size
+		di = 2  # neurons in each layer
+		H = 1  # number of hidden layers
+		
+		input_data = np.array([0.53436063, 0.31448347])
+		
+		#z = np.array([[0.18450251],[0.28731715]])
+		z = np.array([0.18450251])
+				  
+		network = Network(dx, dz, di, H)
+		
+		task = TrainingTask(model=network, input_data=input_data, z=z)
+		task.initialize()
+		output = task.start_training(
+			algorithm_function=gradient_descent,
+			max_iterations=200, verbose=False)
+		# Validate norm less that eta
+		self.assertLess(output[1],0.005)
+
+	def test_single_data_5(self):
+		# print("starting test --- test_single_data_5")
+		dx = 2  # total features
+		dz = 1  # output vector size
+		di = 2  # neurons in each layer
+		H = 1  # number of hidden layers
+		
+		input_data = np.array([0.53436063, 0.31448347])
+		
+		z = np.array([0.18450251])
+				  
+		network = Network(dx, dz, di, H)
+		
+		task = TrainingTask(model=network, input_data=input_data, z=z)
+		task.initialize(5)
+		output = task.start_training(
+			algorithm_function=gradient_descent,
+			verbose=False)
+		# Validate norm less that eta
+		self.assertLess(output[1],0.005)
 
 
 
