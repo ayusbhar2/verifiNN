@@ -10,23 +10,29 @@ from verifiNN.utils import calculus, common_utils
 tol = 0.000001	# tol = O(h^2)
 
 
-# class TestAlgorithm(unittest.TestCase):
+class TestAlgorithm(unittest.TestCase):
 
 
-# 	def test_gradient_descent(self):
-# 		network = Network(4, 3, 2, 2)
-# 		network.generate_network_specs()
-# 		end_point, grad_norm = gradient_descent(
-# 			weights_vector=np.ones(18),
-# 			m_input_data=np.array([1, 2, 3, 4]),
-# 			m_z=np.array([1, 1, 1]),
-# 			model=network,
-# 			e_t=0.001,
-# 			alpha=0.05,
-# 			max_iterations=2,
-# 			verbose=True,
-# 		)
-# 		assert grad_norm==0.0
+	def test_gradient_descent(self):
+		X = np.array([[1, 2], [3, 4]])
+		Z = np.array([5, 6])
+		p = np.array([1, 1, 1])
+
+		lr = LinearRegression()
+		lr.initialize(params=p)
+		trained_model = gradient_descent(
+			lr, X, Z, e_t=0.001, alpha=0.5, max_iters=0)
+		self.assertAlmostEqual(trained_model.params[0], 1)
+		self.assertAlmostEqual(trained_model.params[1], 1)
+		self.assertAlmostEqual(trained_model.params[2], 1, places=3)
+
+		lr = LinearRegression()
+		lr.initialize(params=p)
+		trained_model = gradient_descent(
+			lr, X, Z, e_t=0.001, alpha=0.05, max_iters=1)
+		self.assertAlmostEqual(trained_model.params[0], 0.95)
+		self.assertAlmostEqual(trained_model.params[1], 0.75)
+		self.assertAlmostEqual(trained_model.params[2], 0.7, places=3)
 
 
 class TestLinearRegression(unittest.TestCase):

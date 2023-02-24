@@ -39,12 +39,19 @@ class LinearRegression(Model):
         x_1 = np.append([1], x) # add the affine term
         return np.dot(self.params, x_1)
 
-    def compute_loss(self, X, Z):
+    def compute_loss(self, X, Z, params=None):
         """Compute the loss incurred by the model over a given dataset (X, Z).
         
         X (1D or 2D numpy arrray): m x n matrix with each row an input vector
         Z (1D numpy array): m x 1 matrix with each row a scalar observation
         """
+
+        # TODO(ayush): This is a hack to make `partial` work in algorithm.py
+        # Find a cleaner way to do this.
+        if params is not None:
+            self.params = params
+
+        # TODO(ayush): Vectorize the below for loop.
         loss = 0
         for i in range(len(X)):
             y = self.get_output(X[i])
