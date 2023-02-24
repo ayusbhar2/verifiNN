@@ -23,9 +23,8 @@ def pack_weights(w_vector, list_shape_tuple):
 
     return weight_list
 
-def mean_square_distance(y, z):
-    ''' computes the mean squared distances between 2 vectors (y and z) of equal dimensions (1xn)'''
-    x = y-z
-    squared_vector = np.square(x)
-    loss = squared_vector.sum()
-    return loss
+def check_1D_array(value):
+    if (not type(value) == np.ndarray) or (len(value.shape) != 1):
+        raise TypeError(
+            "expecting a 1D numpy array, got {}".format(type(value))
+        )

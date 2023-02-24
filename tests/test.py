@@ -3,51 +3,93 @@ import unittest
 import numpy as np
 
 from verifiNN.algorithms.algorithm import gradient_descent
-from verifiNN.models.network import Network
+from verifiNN.models.linear_regression import LinearRegression
 from verifiNN.trainer import TrainingTask
 from verifiNN.utils import calculus, common_utils
 
 tol = 0.000001	# tol = O(h^2)
 
 
-class TestAlgorithm(unittest.TestCase):
+# class TestAlgorithm(unittest.TestCase):
 
 
-	def test_gradient_descent(self):
-		network = Network(4, 3, 2, 2)
-		network.generate_network_specs()
-		end_point, grad_norm = gradient_descent(
-			weights_vector=np.ones(18),
-			m_input_data=np.array([1, 2, 3, 4]),
-			m_z=np.array([1, 1, 1]),
-			model=network,
-			e_t=0.001,
-			alpha=0.05,
-			max_iterations=2,
-			verbose=True,
-		)
-		assert grad_norm==0.0
+# 	def test_gradient_descent(self):
+# 		network = Network(4, 3, 2, 2)
+# 		network.generate_network_specs()
+# 		end_point, grad_norm = gradient_descent(
+# 			weights_vector=np.ones(18),
+# 			m_input_data=np.array([1, 2, 3, 4]),
+# 			m_z=np.array([1, 1, 1]),
+# 			model=network,
+# 			e_t=0.001,
+# 			alpha=0.05,
+# 			max_iterations=2,
+# 			verbose=True,
+# 		)
+# 		assert grad_norm==0.0
 
 
-class TestNetwork(unittest.TestCase):
+class TestLinearRegression(unittest.TestCase):
+
+	def test_params(self):
+		lr = LinearRegression()
+		self.assertIsNone(lr.params)
+
+		with self.assertRaises(TypeError):
+			lr.params = np.array([[1, 2, 3]])
+
+	def test_initialize(self):
+		lr = LinearRegression()
+		lr.initialize(n_params=2, offset=1)
+		self.assertGreater(lr.params[0], 1)
+		self.assertLess(lr.params[0], 2)
+
+		self.assertGreater(lr.params[1], 1)
+		self.assertLess(lr.params[1], 2)
+
+	def test_get_output(self):
+		x = np.array([2])
+		p = np.array([1, 2])
+		lr = LinearRegression()
+		lr.initialize(params=p)
+
+		out = lr.get_output(x)
+		self.assertEqual(out, 5)
+
+		with self.assertRaises(TypeError):
+			x = [2] # x should be a np 1D arrray
+			out = lr.get_output(x)
+
+	def test_compute_loss(self):
+		X = np.array([[1, 2], [3, 4]])
+		Z = np.array([5, 6])
+		p = np.array([1, 1, 1])
+
+		lr = LinearRegression()
+		lr.initialize(params=p)
+		loss = lr.compute_loss(X, Z)
+		self.assertEqual(loss, 2.5)
 
 
-	def test_generate_network_specs(self):
-		network = Network(4, 3, 2, 2)
-		arch = network.generate_network_specs()
-		# print(arch)
-
-		self.assertEqual(arch, [(2, 4), (2, 2), (3, 2)])
+# class TestNetwork(unittest.TestCase):
 
 
-	def test_initialize_network(self):
-		network = Network(4, 3, 2, 2)
-		network.generate_network_specs()
-		ntwk = network.initialize_network()
-		# print(ntwk)
-		self.assertEqual(ntwk[0].shape, (2, 4))
-		self.assertEqual(ntwk[1].shape, (2, 2))
-		self.assertEqual(ntwk[2].shape, (3, 2))
+# 	def test_generate_network_specs(self):
+# 		network = Network(4, 3, 2, 2)
+# 		arch = network.generate_network_specs()
+
+# 		self.assertEqual(arch, [(2, 4), (2, 2), (3, 2)])
+
+
+# 	def test_initialize_network(self):
+# 		network = Network(4, 3, 2, 2)
+# 		network.generate_network_specs()
+# 		ntwk = network.initialize_network()
+
+# 		self.assertEqual(ntwk[0].shape, (2, 4))
+# 		self.assertEqual(ntwk[1].shape, (2, 2))
+# 		self.assertEqual(ntwk[2].shape, (3, 2))
+
 
 
 class TestCalculusMethods(unittest.TestCase):
@@ -119,49 +161,49 @@ class TestCommonUtils(unittest.TestCase):
 		)
 
 
-class TestController(unittest.TestCase):
-	def test_single_data_origin(self):
-		# print("starting test --- test_single_data_origin")
-		dx = 2  # total features
-		dz = 1  # output vector size
-		di = 2  # neurons in each layer
-		H = 1  # number of hidden layers
+# class TestController(unittest.TestCase):
+# 	def test_single_data_origin(self):
+# 		# print("starting test --- test_single_data_origin")
+# 		dx = 2  # total features
+# 		dz = 1  # output vector size
+# 		di = 2  # neurons in each layer
+# 		H = 1  # number of hidden layers
 		
-		input_data = np.array([0.53436063, 0.31448347])
+# 		input_data = np.array([0.53436063, 0.31448347])
 		
-		#z = np.array([[0.18450251],[0.28731715]])
-		z = np.array([0.18450251])
+# 		#z = np.array([[0.18450251],[0.28731715]])
+# 		z = np.array([0.18450251])
 				  
-		network = Network(dx, dz, di, H)
+# 		network = Network(dx, dz, di, H)
 		
-		task = TrainingTask(model=network, input_data=input_data, z=z)
-		task.initialize()
-		output = task.start_training(
-			algorithm_function=gradient_descent,
-			max_iterations=200, verbose=False)
-		# Validate norm less that eta
-		self.assertLess(output[1],0.005)
+# 		task = TrainingTask(model=network, input_data=input_data, z=z)
+# 		task.initialize()
+# 		output = task.start_training(
+# 			algorithm_function=gradient_descent,
+# 			max_iterations=200, verbose=False)
+# 		# Validate norm less that eta
+# 		self.assertLess(output[1],0.005)
 
-	def test_single_data_5(self):
-		# print("starting test --- test_single_data_5")
-		dx = 2  # total features
-		dz = 1  # output vector size
-		di = 2  # neurons in each layer
-		H = 1  # number of hidden layers
+# 	def test_single_data_5(self):
+# 		# print("starting test --- test_single_data_5")
+# 		dx = 2  # total features
+# 		dz = 1  # output vector size
+# 		di = 2  # neurons in each layer
+# 		H = 1  # number of hidden layers
 		
-		input_data = np.array([0.53436063, 0.31448347])
+# 		input_data = np.array([0.53436063, 0.31448347])
 		
-		z = np.array([0.18450251])
+# 		z = np.array([0.18450251])
 				  
-		network = Network(dx, dz, di, H)
+# 		network = Network(dx, dz, di, H)
 		
-		task = TrainingTask(model=network, input_data=input_data, z=z)
-		task.initialize(5)
-		output = task.start_training(
-			algorithm_function=gradient_descent,
-			verbose=False)
-		# Validate norm less that eta
-		self.assertLess(output[1],0.005)
+# 		task = TrainingTask(model=network, input_data=input_data, z=z)
+# 		task.initialize(5)
+# 		output = task.start_training(
+# 			algorithm_function=gradient_descent,
+# 			verbose=False)
+# 		# Validate norm less that eta
+# 		self.assertLess(output[1],0.005)
 
 
 

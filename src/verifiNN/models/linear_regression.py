@@ -1,40 +1,56 @@
 
 import numpy as np
 
-from utils import commonutils
-from utils.model import Model
+from verifiNN.utils.common_utils import check_1D_array
+from verifiNN.models.model import Model
 
 
 class LinearRegression(Model):
 
-    def __init__(self, dx):
-
-        self.dx = dx
-        self.theta = []
+    def __init__(self):
+        self._params = None
         self.trained = False
 
-    def initialize(self, start = 0):
-        return self.initialize_weights(start)
+    @property
+    def params(self):
+        return self._params
 
-    def is_trained(self):
-        return self.trained
+    @params.setter
+    def params(self, value):
+        check_1D_array(value)
+        self._params = value
 
-    def get_output(self, input_data, weight_list):
-        return (weight_list.T).dot(input_data)
+    def initialize(self, n_params=0, offset=0, params=None):
+        if params is None:
+            self.params = np.random.rand(n_params) + offset
+        else:
+            self.params = params
 
-    def get_trained_output(self, input_data):
-        return (self.theta.T).dot(input_data)
+    def get_output(self, x):
+        """Compute f(x).
+
+        Input:
+            x(1D numpy array): Single input vector. It is assumed that
+                               len(x) = len(params) - 1
+        Output:
+            f(x) (float): theta_0 + theta_1 x_1 + ... + theta_n x_n
+        """
+        check_1D_array(x)
+        x_1 = np.append([1], x) # add the affine term
+        return np.dot(self.params, x_1)
+
+    def compute_loss(self, X, Z):
+        """Compute the loss incurred by the model over a given dataset (X, Z).
         
-         
-    def initialize_weights(self, start=0):
-        """Generate random weight matrices."""
-
-        self.theta = np.random.rand(1, self.dx) + start
-        return self.theta
-
-    def compute_loss(self, weights_vector, input_data, z):
-        y = self.get_output(input_data=input_data, weight_list=weights_vector)
-        return commonutils.mean_square_distance(y, z)
+        X (1D or 2D numpy arrray): m x n matrix with each row an input vector
+        Z (1D numpy array): m x 1 matrix with each row a scalar observation
+        """
+        loss = 0
+        for i in range(len(X)):
+            y = self.get_output(X[i])
+            z = Z[i]
+            loss += np.linalg.norm(y - z)**2
+        return 0.5*loss
 
 
    

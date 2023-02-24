@@ -17,10 +17,11 @@ class Network(Model):
         self.network = []
         self.trained = False;
 
-    def initialize(self, start=0):
+
+    def initialize(self, start_offset=0):
         self.generate_network_specs()
-        w_list = self.initialize_network(start)
-        self.initial_weights = self.unpack_weights(w_list)
+        w_list = self.initialize_network(start_offset)
+        self.initial_weights = common_utils.unpack_weights(w_list)
         return self.initial_weights
 
 
@@ -47,12 +48,13 @@ class Network(Model):
                 t = (self.di, self.di)
             self.network_specs.append(t)
             i += 1
-        return self.network_specs
+        return self.network_specs # TODO(ayush) No need to return anything
 
-    def initialize_network(self, start=0):
+    # TODO(ayush): Why do we need two "initialize" methods?
+    def initialize_network(self, start_offset=0):
         """Generate random weight matrices from network_specs."""
         for dims in self.network_specs:
-            W = np.random.rand(dims[0], dims[1]) + start
+            W = np.random.rand(dims[0], dims[1]) + start_offset
             self.network.append(W)
         return self.network
 
@@ -64,26 +66,17 @@ class Network(Model):
         #print(f"output: {y} ")
         return common_utils.mean_square_distance(y, z)
 
-    def unpack_weights(self, W_List):
-        '''Returns a 1D array by unpacking all weights in the weight list'''
-        return common_utils.unpack_weights(W_List=W_List)
-
-    def pack_weights(self, w_vector):
-        '''Creates a list of weight matrices form a weights vector accordig to arch.'''
-        return common_utils.pack_weights(w_vector=w_vector, list_shape_tuple=self.network_specs)
 
     def get_output(self,input_data, weight_list):
         '''computes wn.w(n-1)..w1.(input_data)'''
         '''computes and returns y for single data point'''
-
-        # print(f"starting nn for 1 iteration with input {input_data}")
-        # print(f"weights:{weight_list}")
 
         W = self.compute_weight_multiplication(weight_list=weight_list)
         output = W.dot(input_data.T)
 
         return output
 
+    # TODO(ayush): What is this method supposed to do?
     def get_trained_output(self, input_data):
         # TODO - to be implemented
         return super().get_trained_output(input_data)
@@ -91,7 +84,7 @@ class Network(Model):
     def is_trained(self):
         return self.trained;
 
-
+    # TODO:(ayush) Method name makes no sense. Change.
     def compute_weight_multiplication(self,weight_list):
         '''computes wn.w(n-1)..w1, where w(i) is the weight matrix of ith layer'''
 
