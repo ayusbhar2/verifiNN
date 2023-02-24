@@ -1,6 +1,6 @@
-import unittest
-
+import logging
 import numpy as np
+import unittest
 
 from verifiNN.algorithms.algorithm import gradient_descent
 from verifiNN.models.linear_regression import LinearRegression
@@ -21,7 +21,7 @@ class TestAlgorithm(unittest.TestCase):
 		lr = LinearRegression()
 		lr.initialize(params=p)
 		trained_model = gradient_descent(
-			lr, X, Z, e_t=0.001, alpha=0.5, max_iters=0)
+			lr, X, Z, epsilon=0.001, alpha=0.5, max_iters=0)
 		self.assertAlmostEqual(trained_model.params[0], 1)
 		self.assertAlmostEqual(trained_model.params[1], 1)
 		self.assertAlmostEqual(trained_model.params[2], 1, places=3)
@@ -29,7 +29,7 @@ class TestAlgorithm(unittest.TestCase):
 		lr = LinearRegression()
 		lr.initialize(params=p)
 		trained_model = gradient_descent(
-			lr, X, Z, e_t=0.001, alpha=0.05, max_iters=1)
+			lr, X, Z, epsilon=0.001, alpha=0.05, max_iters=1)
 		self.assertAlmostEqual(trained_model.params[0], 0.95)
 		self.assertAlmostEqual(trained_model.params[1], 0.75)
 		self.assertAlmostEqual(trained_model.params[2], 0.7, places=3)

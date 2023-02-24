@@ -24,6 +24,7 @@ class LinearRegression(Model):
         if params is None:
             self.params = np.random.rand(n_params) + offset
         else:
+            # params were explicitly provided
             self.params = params
 
     def get_output(self, x):
@@ -49,6 +50,7 @@ class LinearRegression(Model):
         # TODO(ayush): This is a hack to make `partial` work in algorithm.py
         # Find a cleaner way to do this.
         if params is not None:
+            # params were explicitly provided
             self.params = params
 
         # TODO(ayush): Vectorize the below for loop.

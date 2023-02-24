@@ -1,11 +1,12 @@
-from functools import partial
-
+import logging
 import numpy as np
 
+from functools import partial
 from verifiNN.utils import calculus
 
+#TODO(ayush): Make class so that all algorithms have a consistent interface
 
-def gradient_descent(model, X, Z, e_t=0.001, alpha=0.05, max_iters=100,
+def gradient_descent(model, X, Z, epsilon=0.001, alpha=0.05, max_iters=100,
     verbose=False):
     """Train a model with gradient descent.
 
@@ -18,28 +19,30 @@ def gradient_descent(model, X, Z, e_t=0.001, alpha=0.05, max_iters=100,
         alpha(float): learning rate
         max_iters(int): maximum number of iterations to run.
     """
-
-    loss = model.compute_loss(X, Z)
+    i = 0
+    logging.info("starting gradient descent...")
 
     # create a partial object to facilitate differentiation
     compute_loss_partial = partial(model.compute_loss, X, Z)
 
     gradient_vector = calculus.differentiate(compute_loss_partial, model.params)
     gradient_norm = np.linalg.norm(gradient_vector)
+    loss = model.compute_loss(X, Z)
 
-    i = 0
-    while(gradient_norm > e_t and i < max_iters):
+    logging.info("<iteration>, <loss>, <gradient_norm>")
+    logging.info("{}, {}, {}".format(i, loss, gradient_norm))
+
+    while(gradient_norm > epsilon and i < max_iters):
         # move to new location
         model.params = model.params - alpha*gradient_vector
 
         # compute gradient at new location
         gradient_vector = calculus.differentiate(compute_loss_partial, model.params)
         gradient_norm = np.linalg.norm(gradient_vector)
-
-        # compute new loss
         loss = model.compute_loss(X=X, Z=Z)
+        i += 1
 
-        i = i+1
+        logging.info("{}, {}, {}".format(i, loss, gradient_norm))
 
     return model
 

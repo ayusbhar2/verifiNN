@@ -1,4 +1,3 @@
-controller.py
 venv/
 *.pyc
 */__pycache__/
