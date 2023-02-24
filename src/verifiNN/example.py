@@ -16,7 +16,7 @@ def main():
 	lr = LinearRegression()
 	lr.initialize(params=p)
 
-	tt = TrainingTask(lr, X, Z, gradient_descent)
+	tt = TrainingTask(lr, X, Z, gradient_descent, max_iters=10)
 	tt.start()
 
 
