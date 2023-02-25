@@ -2,6 +2,8 @@ import logging
 import numpy as np
 import unittest
 
+from math import e, log
+
 from verifiNN.algorithms.algorithm import gradient_descent
 from verifiNN.models.models import LinearRegression, LogisticRegression
 from verifiNN.trainer import TrainingTask
@@ -80,7 +82,27 @@ class TestLinearRegression(unittest.TestCase):
 class TestLogisticRegression(unittest.TestCase):
 
 	def test_get_output(self):
+		x = np.array([1, 2])
+		p = np.array([1, 1, 1])
+
 		lor = LogisticRegression()
+		lor.initialize(params=p)
+		out = lor.get_output(x)
+
+		self.assertEqual(out, 0.9820137900379085)
+
+	def test_compute_loss(self):
+		X = np.array([[1, 2], [3, 4]])
+		Z = np.array([0, 1])
+		p = np.array([1, 1, 1])
+
+		lor = LogisticRegression()
+		lor.initialize(params=p)
+		loss = lor.compute_loss(X, Z)
+		exp_loss = -log(1 - e**4 / (1 + e**4)) - log(e**8 / (1 + e**8))
+
+		self.assertEqual(loss, 4.018485334290706)
+
 
 
 
