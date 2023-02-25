@@ -42,7 +42,7 @@ class TrainingTask:
         self.verbose = verbose
 
     def start(self):
-        logging.info("-------------start training with-------------")
+        logging.info("-------------start training-------------")
         logging.info("model: {}".format(self.model.__class__))
         logging.info("algorithm: {}".format(self.algorithm))
         logging.info("epsilon: {}".format(self.epsilon))
