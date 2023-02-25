@@ -1,6 +1,6 @@
 import logging
 
-from verifiNN.models.model import Model
+from verifiNN.models.models import Model
 
 
 class TrainingTask:

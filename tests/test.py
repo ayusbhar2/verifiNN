@@ -3,7 +3,7 @@ import numpy as np
 import unittest
 
 from verifiNN.algorithms.algorithm import gradient_descent
-from verifiNN.models.linear_regression import LinearRegression
+from verifiNN.models.models import LinearRegression, LogisticRegression
 from verifiNN.trainer import TrainingTask
 from verifiNN.utils import calculus, common_utils
 
@@ -75,6 +75,13 @@ class TestLinearRegression(unittest.TestCase):
 		lr.initialize(params=p)
 		loss = lr.compute_loss(X, Z)
 		self.assertEqual(loss, 2.5)
+
+
+class TestLogisticRegression(unittest.TestCase):
+
+	def test_get_output(self):
+		lor = LogisticRegression()
+
 
 
 # class TestNetwork(unittest.TestCase):
@@ -165,6 +172,10 @@ class TestCommonUtils(unittest.TestCase):
 		self.assertTrue(
 			(W_list[1]==np.array([[5, 6], [7, 8]])).all()
 		)
+
+	def test_logistic(self):
+		self.assertAlmostEqual(
+			common_utils.logistic(1), 0.7310585786300049)
 
 
 # class TestController(unittest.TestCase):

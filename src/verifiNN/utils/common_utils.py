@@ -1,5 +1,5 @@
 import numpy as np
-
+from math import e
 
 def unpack_weights(W_List):
     '''Returns a 1D array by unpacking all weights in the weight list'''
@@ -28,3 +28,6 @@ def check_1D_array(value):
         raise TypeError(
             "expecting a 1D numpy array, got {}".format(type(value))
         )
+
+def logistic(x):
+    return e**(x)/(1 + e**x)
