@@ -1,5 +1,5 @@
 import numpy as np
-
+from math import e
 
 def unpack_weights(W_List):
     '''Returns a 1D array by unpacking all weights in the weight list'''
@@ -23,9 +23,11 @@ def pack_weights(w_vector, list_shape_tuple):
 
     return weight_list
 
-def mean_square_distance(y, z):
-    ''' computes the mean squared distances between 2 vectors (y and z) of equal dimensions (1xn)'''
-    x = y-z
-    squared_vector = np.square(x)
-    loss = squared_vector.sum()
-    return loss
+def check_1D_array(value):
+    if (not type(value) == np.ndarray) or (len(value.shape) != 1):
+        raise TypeError(
+            "expecting a 1D numpy array, got {}".format(type(value))
+        )
+
+def logistic(x):
+    return e**(x)/(1 + e**x)

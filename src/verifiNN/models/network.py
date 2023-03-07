@@ -1,8 +1,8 @@
 
 import numpy as np
 
-from utils import commonutils
-from utils.model import Model
+from verifiNN.utils import common_utils
+from verifiNN.models.model import Model
 
 
 class Network(Model):
@@ -17,10 +17,11 @@ class Network(Model):
         self.network = []
         self.trained = False;
 
-    def initialize(self, start=0):
+
+    def initialize(self, start_offset=0):
         self.generate_network_specs()
-        w_list = self.initialize_network(start)
-        self.initial_weights = self.unpack_weights(w_list)
+        w_list = self.initialize_network(start_offset)
+        self.initial_weights = common_utils.unpack_weights(w_list)
         return self.initial_weights
 
 
@@ -30,7 +31,7 @@ class Network(Model):
         Args:
                 dx (Int): length of the input vector
                 dz (Int): length of output vector
-                di (Int): number of neurons in each hiddeen layer
+                di (Int): number of neurons in each hidden layer
                 H (Int): number of hidden layers (excluding the output layer)
         Returns:
                 network_specs (list of tuples): each entry in network_specs is
@@ -47,43 +48,35 @@ class Network(Model):
                 t = (self.di, self.di)
             self.network_specs.append(t)
             i += 1
-        return self.network_specs
+        return self.network_specs # TODO(ayush) No need to return anything
 
-    def initialize_network(self, start=0):
+    # TODO(ayush): Why do we need two "initialize" methods?
+    def initialize_network(self, start_offset=0):
         """Generate random weight matrices from network_specs."""
         for dims in self.network_specs:
-            W = np.random.rand(dims[0], dims[1]) + start
+            W = np.random.rand(dims[0], dims[1]) + start_offset
             self.network.append(W)
         return self.network
 
     def compute_loss(self,weights_vector, input_data, z):
         ''' computes the value of loss function at a given point determined by the weights_vector'''
-        W_list = commonutils.pack_weights(
+        W_list = common_utils.pack_weights(
             w_vector=weights_vector, list_shape_tuple=self.network_specs)
         y = self.get_output(input_data, W_list)
         #print(f"output: {y} ")
-        return commonutils.mean_square_distance(y, z)
+        return common_utils.mean_square_distance(y, z)
 
-    def unpack_weights(self, W_List):
-        '''Returns a 1D array by unpacking all weights in the weight list'''
-        return commonutils.unpack_weights(W_List=W_List)
-
-    def pack_weights(self, w_vector):
-        '''Creates a list of weight matrices form a weights vector accordig to arch.'''
-        return commonutils.pack_weights(w_vector=w_vector, list_shape_tuple=self.network_specs)
 
     def get_output(self,input_data, weight_list):
         '''computes wn.w(n-1)..w1.(input_data)'''
         '''computes and returns y for single data point'''
-
-        # print(f"starting nn for 1 iteration with input {input_data}")
-        # print(f"weights:{weight_list}")
 
         W = self.compute_weight_multiplication(weight_list=weight_list)
         output = W.dot(input_data.T)
 
         return output
 
+    # TODO(ayush): What is this method supposed to do?
     def get_trained_output(self, input_data):
         # TODO - to be implemented
         return super().get_trained_output(input_data)
@@ -91,7 +84,7 @@ class Network(Model):
     def is_trained(self):
         return self.trained;
 
-
+    # TODO:(ayush) Method name makes no sense. Change.
     def compute_weight_multiplication(self,weight_list):
         '''computes wn.w(n-1)..w1, where w(i) is the weight matrix of ith layer'''
 

@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "verifiNN"
+version = "0.0.0.dev6"
+description="A package for optimization based neural network verification."
+authors = [
+  {name = "Ayush Bharadwaj", email = "ayush.bharadwaj@gmail.com"},
+  {name = "Harsh Bolakani", email = "harshbolakani@gmail.com"},
+]
+maintainers = [
+  {name = "Ayush Bharadwaj", email = "ayush.bharadwaj@gmail.com"}
+]
+classifiers=[
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python"
+]
+keywords=[
+  "neural networks", "verification", "convex optimization", "semidefinit programming"
+]
+requires-python = ">=3.7"
+dependencies = [
+  "numpy == 1.21.5",
+  "scipy == 1.7.3",
+]
+
+
+[project.urls]
+homepage = "https://github.com/harshgit/verifiNN/tree/ayush_packaging"
