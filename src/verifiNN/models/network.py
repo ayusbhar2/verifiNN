@@ -2,61 +2,92 @@
 import numpy as np
 
 from verifiNN.utils import common_utils
-from verifiNN.models.model import Model
+from verifiNN.models.models import Model
+
+
+def ReLU(x):
+    if x > 0:
+        return x
+    else:
+        return 0
+
+def Id(x):
+    return x
+
+
+ACTIVATION_FUNCTIONS = {'ReLU': ReLU, 'Id': Id}
 
 
 class Network(Model):
+    """Class representing a Fully-Connected-Feed-Forward Neural Network."""
 
-    def __init__(self, dx, dz, di, H):
-
-        self.dx = dx
-        self.dz = dz
-        self.di = di
-        self.H = H
-        self.network_specs = []
-        self.network = []
-        self.trained = False;
-
-
-    def initialize(self, start_offset=0):
-        self.generate_network_specs()
-        w_list = self.initialize_network(start_offset)
-        self.initial_weights = common_utils.unpack_weights(w_list)
-        return self.initial_weights
-
-
-    def generate_network_specs(self):
-        """Generate a list of tuples contianing matrix dimensions.
+    def __init__(self, dx=None, dy=None, num_hidden_neurons=None, activation='Id'):
+        """Specify the architechture and activation of the network.
 
         Args:
-                dx (Int): length of the input vector
-                dz (Int): length of output vector
-                di (Int): number of neurons in each hidden layer
-                H (Int): number of hidden layers (excluding the output layer)
-        Returns:
-                network_specs (list of tuples): each entry in network_specs is
-                        a tuple of the form (num_rows, num_cols). The ith tuple corresponds
-                        to the ith weight matrix.
+            dx (int): length of the input vector
+            dy (int): length of output vector
+            num_hidden_neurons (list of ints): number of neurons in each hidden
+                layer (excluding the output layer). `num_hidden_neurons` is a list
+                of integers with the value at the i-th position representing
+                the number of neurons in the i-th hidden layer.
         """
-        i = 0
-        while i < self.H + 1:
-            if i == 0:
-                t = (self.di, self.dx)
-            elif i == self.H:
-                t = (self.dz, self.di)
-            else:
-                t = (self.di, self.di)
-            self.network_specs.append(t)
-            i += 1
-        return self.network_specs # TODO(ayush) No need to return anything
+        self.dx = dx
+        self.dy = dy
+        if num_hidden_neurons is not None:
+            if not isinstance(num_hidden_neurons, list):
+                raise("Expecting num_hidden_neurons to be a list. Found {}".format(
+                    type(num_hidden_neurons)))
+        self.num_hidden_neurons = num_hidden_neurons
+        self.activation = ACTIVATION_FUNCTIONS[activation]
+        self.weights = []
+        self.biases = []
 
-    # TODO(ayush): Why do we need two "initialize" methods?
-    def initialize_network(self, start_offset=0):
-        """Generate random weight matrices from network_specs."""
-        for dims in self.network_specs:
-            W = np.random.rand(dims[0], dims[1]) + start_offset
-            self.network.append(W)
-        return self.network
+    
+    def initialize(self, start_offset=0, weights=None, biases=None):
+        """Initialize network using random or user-supplied weights."""
+
+        if weights is not None and biases is not None:
+
+            # Weights were explicitly provided.
+            self.weights = weights
+            self.biases = biases
+            self.dx = weights[0].shape[1]
+            self.dy = weights[-1].shape[0]
+            self.num_hidden_neurons = [w.shape[0] for w in weights[:-1]]
+            self.H = len(self.num_hidden_neurons)
+
+        else:
+
+            # Weights were not provided. Random initialize.    
+            if (self.dx is None or
+                self.dy is None or
+                self.num_hidden_neurons is None):
+                raise("dx, dy and num_hidden_neurons must be provided!")
+
+            H = len(self.num_hidden_neurons) # number of hidden layers
+            for i in range(H + 1):
+                if i == 0:
+                    m = self.num_hidden_neurons[i]
+                    n = self.dx
+                elif i == H:
+                    m = self.dy
+                    n = self.num_hidden_neurons[i - 1]
+                else:
+                    m = self.num_hidden_neurons[i]
+                    n = self.num_hidden_neurons[i - 1]
+                W = np.random.rand(m, n) + start_offset
+                b = np.random.rand(m) + start_offset
+
+                self.weights.append(W)
+                self.biases.append(b)
+                self.H = H
+
+
+    def get_output(self,x):
+
+        pass
+
 
     def compute_loss(self,weights_vector, input_data, z):
         ''' computes the value of loss function at a given point determined by the weights_vector'''
@@ -66,15 +97,6 @@ class Network(Model):
         #print(f"output: {y} ")
         return common_utils.mean_square_distance(y, z)
 
-
-    def get_output(self,input_data, weight_list):
-        '''computes wn.w(n-1)..w1.(input_data)'''
-        '''computes and returns y for single data point'''
-
-        W = self.compute_weight_multiplication(weight_list=weight_list)
-        output = W.dot(input_data.T)
-
-        return output
 
     # TODO(ayush): What is this method supposed to do?
     def get_trained_output(self, input_data):
@@ -99,5 +121,3 @@ class Network(Model):
 
         # print(f"final weights: {W}")
         return W
-
-

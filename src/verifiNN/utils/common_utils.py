@@ -8,13 +8,13 @@ def unpack_weights(W_List):
     return unpacked_array
 
 
-def pack_weights(w_vector, list_shape_tuple):
+def pack_weights(w_vector, architecture):
     '''Creates a list of weight matrices form a weights vector accordig to arch.'''
 
     weight_list = []
     i = 0
 
-    for shape in list_shape_tuple:
+    for shape in architecture:
         size = shape[0]*shape[1]
         w = w_vector[i:size+i]
         w_reshaped = w.reshape(shape[0], shape[1])

@@ -5,6 +5,7 @@ import unittest
 from math import e, log
 
 from verifiNN.algorithms.algorithm import gradient_descent
+from verifiNN.models.network import Network
 from verifiNN.models.models import LinearRegression, LogisticRegression
 from verifiNN.trainer import TrainingTask
 from verifiNN.utils import calculus, common_utils
@@ -105,25 +106,53 @@ class TestLogisticRegression(unittest.TestCase):
 
 
 
+class TestNetwork(unittest.TestCase):
 
-# class TestNetwork(unittest.TestCase):
+	def test_init(self):
+	
+		nw = Network(activation='Id')
+		self.assertEqual(nw.activation(2), 2) # Identity function
+
+		with self.assertRaises(Exception):
+			network = Network()
+			network.initialize()
+
+		with self.assertRaises(Exception):
+			network = Network(dx=3, dy=2, num_hidden_neurons=2)
 
 
-# 	def test_generate_network_specs(self):
-# 		network = Network(4, 3, 2, 2)
-# 		arch = network.generate_network_specs()
+	def test_initialize_explicit(self):
+		W1 = np.array([[1, 2, -1], [3, 4, -3]])
+		b1 = np.array([5, 6])
+		W2 = np.array([[7, 8], [9, 10]])
+		b2 = np.array([11, 12])
 
-# 		self.assertEqual(arch, [(2, 4), (2, 2), (3, 2)])
+		weights = [W1, W2]
+		biases = [b1, b2]
 
+		network = Network(activation='Id')
+		network.initialize(weights=weights, biases=biases)
 
-# 	def test_initialize_network(self):
-# 		network = Network(4, 3, 2, 2)
-# 		network.generate_network_specs()
-# 		ntwk = network.initialize_network()
+		self.assertEqual(network.weights, weights)
+		self.assertEqual(network.biases, biases)
+		self.assertEqual(network.dx, 3)
+		self.assertEqual(network.dy, 2)
+		self.assertEqual(len(network.num_hidden_neurons), 1)
+		self.assertEqual(network.num_hidden_neurons[0], 2)		
+		self.assertEqual(network.H, 1)
 
-# 		self.assertEqual(ntwk[0].shape, (2, 4))
-# 		self.assertEqual(ntwk[1].shape, (2, 2))
-# 		self.assertEqual(ntwk[2].shape, (3, 2))
+	
+	def test_initialize_random(self):
+
+		network = Network(dx=3, dy=2, num_hidden_neurons=[2])
+		network.initialize()
+
+		self.assertEqual(network.weights[0].shape, (2, 3))
+		self.assertEqual(network.weights[1].shape, (2, 2))
+		self.assertEqual(network.biases[0].shape, (2,))
+		self.assertEqual(network.biases[1].shape, (2,))
+		self.assertEqual(network.H, 1)
+		self.assertEqual(network.num_hidden_neurons, [2])
 
 
 
@@ -198,51 +227,6 @@ class TestCommonUtils(unittest.TestCase):
 	def test_logistic(self):
 		self.assertAlmostEqual(
 			common_utils.logistic(1), 0.7310585786300049)
-
-
-# class TestController(unittest.TestCase):
-# 	def test_single_data_origin(self):
-# 		# print("starting test --- test_single_data_origin")
-# 		dx = 2  # total features
-# 		dz = 1  # output vector size
-# 		di = 2  # neurons in each layer
-# 		H = 1  # number of hidden layers
-		
-# 		input_data = np.array([0.53436063, 0.31448347])
-		
-# 		#z = np.array([[0.18450251],[0.28731715]])
-# 		z = np.array([0.18450251])
-				  
-# 		network = Network(dx, dz, di, H)
-		
-# 		task = TrainingTask(model=network, input_data=input_data, z=z)
-# 		task.initialize()
-# 		output = task.start_training(
-# 			algorithm_function=gradient_descent,
-# 			max_iterations=200, verbose=False)
-# 		# Validate norm less that eta
-# 		self.assertLess(output[1],0.005)
-
-# 	def test_single_data_5(self):
-# 		# print("starting test --- test_single_data_5")
-# 		dx = 2  # total features
-# 		dz = 1  # output vector size
-# 		di = 2  # neurons in each layer
-# 		H = 1  # number of hidden layers
-		
-# 		input_data = np.array([0.53436063, 0.31448347])
-		
-# 		z = np.array([0.18450251])
-				  
-# 		network = Network(dx, dz, di, H)
-		
-# 		task = TrainingTask(model=network, input_data=input_data, z=z)
-# 		task.initialize(5)
-# 		output = task.start_training(
-# 			algorithm_function=gradient_descent,
-# 			verbose=False)
-# 		# Validate norm less that eta
-# 		self.assertLess(output[1],0.005)
 
 
 
