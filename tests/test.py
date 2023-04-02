@@ -155,6 +155,41 @@ class TestNetwork(unittest.TestCase):
 		self.assertEqual(network.num_hidden_neurons, [2])
 
 
+	def test_get_output_Id(self):
+		W1 = np.array([[1, 2, -1], [3, 4, -3]])
+		b1 = np.array([5, 6])
+		W2 = np.array([[7, 8], [9, 10]])
+		b2 = np.array([11, 12])
+
+		weights = [W1, W2]
+		biases = [b1, b2]
+
+		# Id
+		network = Network(activation='Id')
+		network.initialize(weights=weights, biases=biases)
+
+		x = np.array([1, 1, 1])
+		self.assertEqual(network.get_output(x)[0], 140)
+		self.assertEqual(network.get_output(x)[1], 175)
+
+	def test_get_output_ReLU(self):
+		W1 = np.array([[1, 2, 3], [-4, -5, -6]])
+		b1 = np.array([5, 6])
+		W2 = np.array([[7, 8], [-9, -10]])
+		b2 = np.array([11, 12])
+
+		weights = [W1, W2]
+		biases = [b1, b2]
+
+		# ReLU
+		network = Network(activation='ReLU')
+		network.initialize(weights=weights, biases=biases)
+
+		x = np.array([1, 1, 1])
+		self.assertEqual(network.get_output(x)[0], 88)
+		self.assertEqual(network.get_output(x)[1], 0)
+
+
 
 class TestCalculusMethods(unittest.TestCase):
 

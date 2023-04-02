@@ -48,7 +48,6 @@ class Network(Model):
         """Initialize network using random or user-supplied weights."""
 
         if weights is not None and biases is not None:
-
             # Weights were explicitly provided.
             self.weights = weights
             self.biases = biases
@@ -58,8 +57,7 @@ class Network(Model):
             self.H = len(self.num_hidden_neurons)
 
         else:
-
-            # Weights were not provided. Random initialize.    
+            # Weights were not provided. Random initialize.
             if (self.dx is None or
                 self.dy is None or
                 self.num_hidden_neurons is None):
@@ -84,13 +82,17 @@ class Network(Model):
                 self.H = H
 
 
-    def get_output(self,x):
+    def get_output(self, x):
+        res = x
+        for i in range(self.H + 1):
+            res = list(map(
+                self.activation, np.dot(self.weights[i], res) + self.biases[i]))
 
-        pass
+        return res
 
 
     def compute_loss(self,weights_vector, input_data, z):
-        ''' computes the value of loss function at a given point determined by the weights_vector'''
+        '''Computes the value of loss function at a given point determined by the weights_vector'''
         W_list = common_utils.pack_weights(
             w_vector=weights_vector, list_shape_tuple=self.network_specs)
         y = self.get_output(input_data, W_list)
@@ -98,26 +100,3 @@ class Network(Model):
         return common_utils.mean_square_distance(y, z)
 
 
-    # TODO(ayush): What is this method supposed to do?
-    def get_trained_output(self, input_data):
-        # TODO - to be implemented
-        return super().get_trained_output(input_data)
-
-    def is_trained(self):
-        return self.trained;
-
-    # TODO:(ayush) Method name makes no sense. Change.
-    def compute_weight_multiplication(self,weight_list):
-        '''computes wn.w(n-1)..w1, where w(i) is the weight matrix of ith layer'''
-
-        W = np.empty([2, 2])  # TODO - any other way to initialize?
-
-        size = len(weight_list)
-        for i in range(size-1, 0, -1):
-            if(i == size-1):
-                W = weight_list[i].dot(weight_list[i-1])
-            else:
-                W = W.dot(weight_list[i-1])
-
-        # print(f"final weights: {W}")
-        return W
