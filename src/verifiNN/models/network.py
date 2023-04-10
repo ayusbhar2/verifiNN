@@ -1,17 +1,6 @@
 import numpy as np
 
-def ReLU(x):
-	if x > 0:
-		return x
-	else:
-		return 0
-
-def Id(x):
-	return x
-
-ACTIVATION_FUNCTIONS = {'ReLU': ReLU, 'Id': Id}
-LABELING_FUNCTIONS = {'argmax': np.argmax}
-
+from verifiNN.utils.utils import ACTIVATION_FUNCTIONS, LABELING_FUNCTIONS
 
 class Network:
 
@@ -23,12 +12,12 @@ class Network:
 		self.H = len(weights) - 1 # num of hidden layers
 
 	def get_output(self, x):
-		res = x
+		result = x
 		for i in range(self.H + 1):
-			res = list(map(
-				self.activation, np.dot(self.weights[i], res) + self.biases[i]))
+			result = list(map(
+				self.activation, np.dot(self.weights[i], result) + self.biases[i]))
 
-		return res
+		return result
 
 	def classify(self, x):
 		y = self.get_output(x)

@@ -2,6 +2,7 @@ import numpy as np
 import unittest
 
 from verifiNN.models.network import Network
+from verifiNN.verifier import Verifier
 
 
 class TestNetwork(unittest.TestCase):
@@ -65,6 +66,30 @@ class TestNetwork(unittest.TestCase):
 		x = np.array([1, 1, 1])
 		l = network.classify(x)
 		self.assertEqual(l, 1)
+
+class TestVerifier(unittest.TestCase):
+
+	W1 = np.array([[0.995, -0.100], [0.100, 0.995]])
+	b1 = np.array([-1, 0])
+	W2 = np.array([[0.622, 0.783], [-0.783, 0.622]])
+	b2 = np.array([-2, 0])
+
+	weights = [W1, W2]
+	biases = [b1, b2]
+	network = Network(weights, biases, activation='ReLU')
+
+	epsilon = 0.5; x0 = np.array([1, 1])
+
+	def test_get_activation_patters(self):
+		vf = Verifier(self.network, self.epsilon, self.x0)
+		patterns = vf.get_activation_patterns(self.x0)
+		for p in patterns:
+			self.assertTrue((p == [0, 1]).all())
+
+	def test_verify(self):
+		vf = Verifier(self.network, self.epsilon, self.x0)
+		vf.verify()
+
 
 
 if __name__ == '__main__':
