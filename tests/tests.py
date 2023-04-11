@@ -1,8 +1,9 @@
+import cvxpy as cp
 import numpy as np
 import unittest
 
 from verifiNN.models.network import Network
-from verifiNN.verifier import Verifier
+from verifiNN.verifier import LPVerifier
 
 
 class TestNetwork(unittest.TestCase):
@@ -67,7 +68,7 @@ class TestNetwork(unittest.TestCase):
 		l = network.classify(x)
 		self.assertEqual(l, 1)
 
-class TestVerifier(unittest.TestCase):
+class TestLPVerifier(unittest.TestCase):
 
 	W1 = np.array([[0.995, -0.100], [0.100, 0.995]])
 	b1 = np.array([-1, 0])
@@ -78,17 +79,66 @@ class TestVerifier(unittest.TestCase):
 	biases = [b1, b2]
 	network = Network(weights, biases, activation='ReLU')
 
-	epsilon = 0.5; x0 = np.array([1, 1])
+	epsilon = 0.5; x_0 = np.array([1, 1])
 
 	def test_get_activation_patters(self):
-		vf = Verifier(self.network, self.epsilon, self.x0)
-		patterns = vf.get_activation_patterns(self.x0)
+		vf = LPVerifier()
+		vf.network = self.network
+		patterns = vf.get_activation_pattern(self.x_0)
 		for p in patterns:
 			self.assertTrue((p == [0, 1]).all())
 
+	def test_generate_decision_variables(self):
+		vf = LPVerifier()
+		vf.network = self.network
+		vf.generate_decision_variables()
+		self.assertEqual(vf.variables['z_0'].shape[0], 2)
+		self.assertEqual(vf.variables['z_1'].shape[0], 2)
+		self.assertEqual(vf.variables['z_2'].shape[0], 2)
+
+		self.assertEqual(vf.variables['z_hat_1'].shape[0], 2)
+		self.assertEqual(vf.variables['z_hat_2'].shape[0], 2)
+
+	def test_generate_region_constraints(self):
+		vf = LPVerifier()
+		vf.network = self.network
+		vf.generate_decision_variables()
+		reg_cons = vf.generate_region_constraints(self.x_0, self.epsilon)
+		self.assertEqual(len(reg_cons), 2)
+
+
+	def test_generate_affine_constraints(self):
+		vf = LPVerifier()
+		vf.network = self.network
+		vf.generate_decision_variables()
+		aff_cons = vf.generate_affine_constraints()
+		self.assertEqual(len(aff_cons), 2)
+
+
+	def test_generate_ReLU_constraints(self):
+		vf = LPVerifier()
+		vf.network = self.network
+		vf.generate_decision_variables()
+		ReLU_cons = vf.generate_ReLU_constraints(self.x_0)
+		self.assertEqual(len(ReLU_cons), 4)
+
+
+	def test_generate_safety_set_constraints(self):
+		l0 = self.network.classify(self.x_0)
+		self.assertEqual(l0, 1)
+
+		l = 0
+		vf = LPVerifier()
+		vf.network = self.network
+		vf.generate_decision_variables()
+		ss_cons = vf.generate_safety_set_constraint(l0, l)
+		self.assertIsInstance(ss_cons, cp.constraints.nonpos.Inequality)
+
+
 	def test_verify(self):
-		vf = Verifier(self.network, self.epsilon, self.x0)
-		vf.verify()
+		vf = LPVerifier()
+		status = vf.verify_epsilon_robustness(self.network, self.x_0, self.epsilon)
+		self.assertEqual(status, 'infeasible')
 
 
 
