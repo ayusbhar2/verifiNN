@@ -5,17 +5,13 @@ import numpy as np
 from verifiNN.models.network import Network
 
 
-# TODO: Implement MILP and SDP methods
-class LPVerifier:
+class AbstractVerifier:
 
-
-	# TODO: Accept verification method as argument
 	def __init__(self):
 		self.network = None
 		self.variables = {}
-		self.varid_to_name_map = {}
+		self.var_name_to_id_map = {}
 		self.constraints = []
-
 
 	def get_var(self, name)-> cp.Variable:
 		try:
@@ -25,15 +21,32 @@ class LPVerifier:
 		
 		return var
 
-
 	def add_var(self, shape: tuple, name: str):
 		if len(name) == 0:
 			raise ValueError('Cannot create variable with empty name!')
 
 		var = cp.Variable(shape, name=name)
 		self.variables[name] = var # check for collision
-		self.varid_to_name_map[var.id] = name
+		self.var_name_to_id_map[name] = var.id
 
+	def extract_solution(self, prob):
+		status = prob.solution.status
+		opt_val = prob.solution.opt_val
+		if not len(prob.solution.primal_vars) == 0:
+			z_0_id = self.var_name_to_id_map['z_0'] # hack
+			z_0_value = prob.solution.primal_vars[z_0_id]
+		else:
+			z_0_value = None
+
+		solution = {'problem_status': status,
+					'optimal_value': opt_val,
+					'adversarial_example': z_0_value}
+
+		return solution	
+
+
+# TODO: Implement MILP and SDP verifiers
+class LPVerifier(AbstractVerifier):
 
 	def generate_decision_variables(self):
 		n = len(self.network.weights[0][0]) # num columns in first matrix
@@ -44,7 +57,6 @@ class LPVerifier:
 			self.add_var(di, f'z_hat_{i+1}')
 			self.add_var(di, f'z_{i+1}')
 		
-
 	def get_activation_pattern(self, x: np.array) -> list:
 		H = self.network.H
 		phi = self.network.activation
@@ -62,7 +74,6 @@ class LPVerifier:
 
 		return activation_pattern
 
-
 	def generate_region_constraints(self, x_0: float, epsilon: float) -> list:
 		z_0 = self.get_var('z_0')
 		unit = np.ones_like(z_0)
@@ -70,7 +81,6 @@ class LPVerifier:
 							  z_0 >= x_0 - epsilon * unit]
 
 		return region_constraints
-
 
 	def generate_affine_constraints(self) -> list:
 		affine_constraints = []
@@ -82,7 +92,6 @@ class LPVerifier:
 			affine_constraints.append(constr)
 
 		return affine_constraints
-
 
 	def generate_ReLU_constraints(self, x_0: float) -> list:
 		ReLU_constraints = []
@@ -103,7 +112,6 @@ class LPVerifier:
 
 		return ReLU_constraints
 
-
 	def generate_safety_set_constraint(self, l_0: int, l: int) -> bool:
 		"""Generate safety set constraint against an adversarial class label."""
 
@@ -115,7 +123,6 @@ class LPVerifier:
 		ss_cons = ((e_0 - e_l) @ z_H_plus_1 <= 0)
 
 		return ss_cons
-
 
 	def verify_epsilon_robustness(self, network: Network, x_0: np.array, epsilon: float) -> bool:
 		"""Verify epsilon-robustness of the network via LP satisfiability."""
@@ -148,7 +155,7 @@ class LPVerifier:
 		l_0 = np.argsort(y)[-1]
 
 		i = -2
-		while i >= -m: # test against each class
+		while i >= -m: # test against each classs
 			l = np.argsort(y)[i]
 			ss_cons = self.generate_safety_set_constraint(l_0, l)
 			constraints = region_cons + aff_cons + ReLU_cons + [ss_cons]
@@ -163,21 +170,5 @@ class LPVerifier:
 
 			i -= 1
 
+		return self.extract_solution(prob)
 
-		return prob.status
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		

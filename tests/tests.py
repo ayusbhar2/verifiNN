@@ -23,7 +23,6 @@ class TestNetwork(unittest.TestCase):
 		self.assertTrue((nw.biases[0] == b1).all())
 		self.assertTrue((nw.biases[1] == b2).all())
 
-
 	def test_get_output_Id(self):
 		W1 = np.array([[1, 2, -1], [3, 4, -3]])
 		b1 = np.array([5, 6])
@@ -38,7 +37,6 @@ class TestNetwork(unittest.TestCase):
 		self.assertEqual(network.get_output(x)[0], 140)
 		self.assertEqual(network.get_output(x)[1], 175)
 
-
 	def test_get_output_ReLU(self):
 		W1 = np.array([[1, 2, 3], [-4, -5, -6]])
 		b1 = np.array([5, 6])
@@ -52,7 +50,6 @@ class TestNetwork(unittest.TestCase):
 		x = np.array([1, 1, 1])
 		self.assertEqual(network.get_output(x)[0], 88)
 		self.assertEqual(network.get_output(x)[1], 0)
-
 
 	def test_classify(self):
 		W1 = np.array([[1, 2, -1], [3, 4, -3]])
@@ -106,7 +103,6 @@ class TestLPVerifier(unittest.TestCase):
 		reg_cons = vf.generate_region_constraints(self.x_0, self.epsilon)
 		self.assertEqual(len(reg_cons), 2)
 
-
 	def test_generate_affine_constraints(self):
 		vf = LPVerifier()
 		vf.network = self.network
@@ -114,14 +110,12 @@ class TestLPVerifier(unittest.TestCase):
 		aff_cons = vf.generate_affine_constraints()
 		self.assertEqual(len(aff_cons), 2)
 
-
 	def test_generate_ReLU_constraints(self):
 		vf = LPVerifier()
 		vf.network = self.network
 		vf.generate_decision_variables()
 		ReLU_cons = vf.generate_ReLU_constraints(self.x_0)
 		self.assertEqual(len(ReLU_cons), 4)
-
 
 	def test_generate_safety_set_constraints(self):
 		l0 = self.network.classify(self.x_0)
@@ -134,12 +128,31 @@ class TestLPVerifier(unittest.TestCase):
 		ss_cons = vf.generate_safety_set_constraint(l0, l)
 		self.assertIsInstance(ss_cons, cp.constraints.nonpos.Inequality)
 
-
-	def test_verify(self):
+	def test_verify_epsilon_robustness_infeasible(self):
 		vf = LPVerifier()
-		status = vf.verify_epsilon_robustness(self.network, self.x_0, self.epsilon)
-		self.assertEqual(status, 'infeasible')
+		result = vf.verify_epsilon_robustness(self.network, self.x_0, self.epsilon)
+		self.assertEqual(result['problem_status'], 'infeasible')
+		self.assertEqual(result['optimal_value'], np.inf)
+		self.assertIsNone(result['adversarial_example'])
 
+	def test_verify_epsilon_robustness_feasible(self):
+		W1 = np.array([[1, 0], [0, 1]])
+		b1 = np.array([1, 1])
+		W2 = np.array([[0, 1], [1, 0]])
+		b2 = np.array([2, 2])
+
+		weights = [W1, W2]
+		biases = [b1, b2]
+		network = Network(weights, biases, activation='ReLU')
+
+		epsilon = 1.5; x_0 = np.array([1, 2])
+
+		vf = LPVerifier()
+		result = vf.verify_epsilon_robustness(network, x_0, epsilon)
+		self.assertEqual(result['problem_status'], 'optimal')
+		self.assertEqual(result['optimal_value'], 1.0)
+		self.assertAlmostEqual(result['adversarial_example'][0], 1.0134037)
+		self.assertAlmostEqual(result['adversarial_example'][1], 0.6628437)
 
 
 if __name__ == '__main__':
