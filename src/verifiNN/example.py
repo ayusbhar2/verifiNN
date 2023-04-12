@@ -1,38 +1,22 @@
-import logging
 import numpy as np
 
-from verifiNN.trainer import TrainingTask
-from verifiNN.models.models import LinearRegression, LogisticRegression
-from verifiNN.algorithms.algorithm import gradient_descent
+from verifiNN.models.network import Network
 
 
-def main():
-	logging.basicConfig(level=logging.INFO)
+W1 = np.array([[1, 0],
+			  [0, 1]])
+b1 = np.array([1, 1])
+W2 = np.array([[0, 1],
+			  [1, 0]])
+b2 = np.array([2, 2])
 
-	# ~ Linear Regression ~ #
+weights = [W1, W2]
+biases = [b1, b2]
+network = Network(weights, biases, activation='ReLU', labeler='argmax')
 
-	X = np.array([[1, 2], [3, 4]])
-	Z = np.array([5, 6])
-	p = np.array([1, 1, 1])
+x_0 = np.array([1, 2])
+l_0 = network.classify(x_0) # returns 0
 
-	lr = LinearRegression()
-	lr.initialize(params=p)
+x_1 = np.array([2, 1])
+l_1 = network.classify(x_1) # returns 1
 
-	tt = TrainingTask(lr, X, Z, gradient_descent, max_iters=10)
-	tt.start()
-
-	# ~ Logistic Regression ~ #
-
-	X = np.array([[1, 2], [3, 4]])
-	Z = np.array([0, 1])
-	p = np.array([1, 1, 1])
-
-	lor = LogisticRegression()
-	lor.initialize(params=p)
-
-	tt1 = TrainingTask(lor, X, Z, gradient_descent, max_iters=10)
-	tt1.start()
-
-
-if __name__ == "__main__":
-	main()
