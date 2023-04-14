@@ -207,7 +207,6 @@ class TestLPVerifier(unittest.TestCase):
 		self.assertAlmostEqual(result['optimal_value'], 0.5)
 
 
-
 if __name__ == '__main__':
 	unittest.main()
 
