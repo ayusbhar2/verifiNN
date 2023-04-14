@@ -134,11 +134,11 @@ class LPVerifier(AbstractVerifier):
 		ReLU_cons = self.generate_ReLU_constraints(x_0) # ReLU const
 
 		y = self.network.get_output(x_0)
-		m = len(y)
+		K = len(y)
 		l_0 = np.argsort(y)[-1]
 
 		i = -2
-		while i >= -m: # test against each classs
+		while i >= -K: # test against each classs
 			l = np.argsort(y)[i]
 			ss_cons = self.generate_safety_set_constraint(l_0, l) # safety-set const
 			constraints = region_cons + aff_cons + ReLU_cons + [ss_cons]
@@ -165,10 +165,11 @@ class LPVerifier(AbstractVerifier):
 
 	def compute_pointwise_robustness(self, network: Network, x_0: np.array,
 		epsilon: float) -> dict:
+		"""Compute the distance to the nearest adversarial example."""
 
 		self.network = network
 		self.generate_decision_variables()
 
-		obj = cp.Minimize(cp.norm_inf(x_0 - self.get_var('z_0')))
+		obj = cp.Minimize(cp.norm_inf(x_0 - self.get_var('z_0'))) # hack
 		return self._solve(network, x_0, epsilon, obj)
 
