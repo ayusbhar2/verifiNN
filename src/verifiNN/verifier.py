@@ -7,8 +7,8 @@ from verifiNN.models.network import Network
 
 class AbstractVerifier:
 
-	def __init__(self):
-		self.network = None
+	def __init__(self, network=None):
+		self.network = network
 		self.variables = {}
 		self.var_name_to_id_map = {}
 		self.constraints = []
@@ -124,32 +124,15 @@ class LPVerifier(AbstractVerifier):
 
 		return ss_cons
 
-	def verify_epsilon_robustness(self, network: Network, x_0: np.array, epsilon: float) -> bool:
-		"""Verify epsilon-robustness of the network via LP satisfiability."""
+	def _solve(self, network: Network, x_0: np.array, epsilon: float,
+		obj: cp.problems.objective.Minimize) -> dict:
 
-		# ~ Variables ~ #
-
-		self.network = network
-		self.generate_decision_variables()
-
-		# ~ Objective ~ #
-
-		obj = cp.Minimize(1)
-
-		# ~ Constraints ~ #
-
+		# Constraints
 		constraints = []
+		region_cons = self.generate_region_constraints(x_0, epsilon) # region const
+		aff_cons = self.generate_affine_constraints() # affine const
+		ReLU_cons = self.generate_ReLU_constraints(x_0) # ReLU const
 
-		# Region of interest constraints
-		region_cons = self.generate_region_constraints(x_0, epsilon)
-		
-		# Affine constraints
-		aff_cons = self.generate_affine_constraints()
-
-		# ReLU constraints
-		ReLU_cons = self.generate_ReLU_constraints(x_0)
-
-		# Safety set constraints
 		y = self.network.get_output(x_0)
 		m = len(y)
 		l_0 = np.argsort(y)[-1]
@@ -157,18 +140,35 @@ class LPVerifier(AbstractVerifier):
 		i = -2
 		while i >= -m: # test against each classs
 			l = np.argsort(y)[i]
-			ss_cons = self.generate_safety_set_constraint(l_0, l)
+			ss_cons = self.generate_safety_set_constraint(l_0, l) # safety-set const
 			constraints = region_cons + aff_cons + ReLU_cons + [ss_cons]
 
-			# ~ Problem ~ #
-
+			# Problem
 			prob = cp.Problem(obj, constraints)
 			prob.solve()
 
 			if prob.status == 'optimal':
 				break
-
 			i -= 1
 
 		return self.extract_solution(prob)
+
+	def verify_epsilon_robustness(self, network: Network, x_0: np.array,
+		epsilon: float) -> dict:
+		"""Verify epsilon-robustness of the network via LP satisfiability."""
+
+		self.network = network
+		self.generate_decision_variables()
+
+		obj = cp.Minimize(1)
+		return self._solve(network, x_0, epsilon, obj)
+
+	def compute_pointwise_robustness(self, network: Network, x_0: np.array,
+		epsilon: float) -> dict:
+
+		self.network = network
+		self.generate_decision_variables()
+
+		obj = cp.Minimize(cp.norm_inf(x_0 - self.get_var('z_0')))
+		return self._solve(network, x_0, epsilon, obj)
 
