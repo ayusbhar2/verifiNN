@@ -3,6 +3,7 @@ import numpy as np
 from verifiNN.models.network import Network
 
 
+# Defining a network
 W1 = np.array([[1, 0],
 			  [0, 1]])
 b1 = np.array([1, 1])
@@ -14,9 +15,13 @@ weights = [W1, W2]
 biases = [b1, b2]
 network = Network(weights, biases, activation='ReLU', labeler='argmax')
 
+# Classifying an input using a network
 x_0 = np.array([1, 2])
 l_0 = network.classify(x_0) # returns 0
 
 x_1 = np.array([2, 1])
 l_1 = network.classify(x_1) # returns 1
+
+# verifying the epsilon robustness of a network at a reference point
+
 
