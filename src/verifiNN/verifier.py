@@ -125,7 +125,6 @@ class LPVerifier(AbstractVerifier):
 
 		return ss_cons
 
-<<<<<<< HEAD
 	def _solve(self, network: Network, x_0: np.array, epsilon: float,
 		obj: cp.problems.objective.Minimize) -> dict:
 
@@ -146,60 +145,15 @@ class LPVerifier(AbstractVerifier):
 			constraints = region_cons + aff_cons + ReLU_cons + [ss_cons]
 
 			# Problem
-=======
-	def verify_epsilon_robustness(self, network: Network, x_0: np.array, epsilon: float) -> bool:
-		"""Verify epsilon-robustness of the network via LP satisfiability."""
-
-		# ~ Variables ~ #
-
-		self.network = network
-		self.generate_decision_variables()
-
-		# ~ Objective ~ #
-
-		obj = cp.Minimize(1)
-
-		# ~ Constraints ~ #
-
-		constraints = []
-
-		# Region of interest constraints
-		region_cons = self.generate_region_constraints(x_0, epsilon)
-		
-		# Affine constraints
-		aff_cons = self.generate_affine_constraints()
-
-		# ReLU constraints
-		ReLU_cons = self.generate_ReLU_constraints(x_0)
-
-		# Safety set constraints
-		y = self.network.get_output(x_0)
-		m = len(y)
-		l_0 = np.argsort(y)[-1]
-
-		i = -2
-		while i >= -m: # test against each classs
-			l = np.argsort(y)[i]
-			ss_cons = self.generate_safety_set_constraint(l_0, l)
-			constraints = region_cons + aff_cons + ReLU_cons + [ss_cons]
-
-			# ~ Problem ~ #
-
->>>>>>> master
 			prob = cp.Problem(obj, constraints)
 			prob.solve()
 
 			if prob.status == 'optimal':
 				break
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 			i -= 1
 
 		return self.extract_solution(prob)
 
-<<<<<<< HEAD
 	def verify_epsilon_robustness(self, network: Network, x_0: np.array,
 		epsilon: float) -> dict:
 		"""Verify epsilon-robustness of the network via LP satisfiability."""
@@ -219,6 +173,3 @@ class LPVerifier(AbstractVerifier):
 
 		obj = cp.Minimize(cp.norm_inf(x_0 - self.get_var('z_0'))) # hack
 		return self._solve(network, x_0, epsilon, obj)
-
-=======
->>>>>>> master
