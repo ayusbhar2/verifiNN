@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "verifiNN"
-version = "0.0.0.dev6"
+version = "0.0.0.dev7"
 description="A package for optimization based neural network verification."
 authors = [
   {name = "Ayush Bharadwaj", email = "ayush.bharadwaj@gmail.com"},
@@ -30,4 +30,4 @@ dependencies = [
 
 
 [project.urls]
-homepage = "https://github.com/harshgit/verifiNN/tree/ayush_packaging"
+homepage = "https://github.com/ayusbhar2/verifiNN"
