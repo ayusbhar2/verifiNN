@@ -7,7 +7,6 @@ from verifiNN.models.network import Network
 
 class AbstractVerifier:
 
-
 	def __init__(self, network=None):
 		self.network = network
 		self.variables = {}
@@ -125,7 +124,7 @@ class LPVerifier(AbstractVerifier):
 
 		return ss_cons
 
-	def _solve(self, network: Network, x_0: np.array, epsilon: float,
+	def _solve(self, x_0: np.array, epsilon: float,
 		obj: cp.problems.objective.Minimize) -> dict:
 
 		# Constraints
@@ -162,7 +161,18 @@ class LPVerifier(AbstractVerifier):
 		self.generate_decision_variables()
 
 		obj = cp.Minimize(1)
-		return self._solve(network, x_0, epsilon, obj)
+		result = self._solve(x_0, epsilon, obj)
+
+		if result['problem_status'] == 'optimal':
+			result.update({'verification_status': 'verified'})
+			result.update({'robustness_status': 'not_robust'})
+			result.update({'pointwise_robustness': 'unavailable'})
+		else:
+			result.update({'verification_status': 'unverified'})
+			result.update({'robustness_status': 'unknown'})
+			result.update({'pointwise_robustness': 'unavailable'})
+
+		return result
 
 	def compute_pointwise_robustness(self, network: Network, x_0: np.array,
 		epsilon: float) -> dict:
@@ -172,4 +182,15 @@ class LPVerifier(AbstractVerifier):
 		self.generate_decision_variables()
 
 		obj = cp.Minimize(cp.norm_inf(x_0 - self.get_var('z_0'))) # hack
-		return self._solve(network, x_0, epsilon, obj)
+		result = self._solve(x_0, epsilon, obj)
+
+		if result['problem_status'] == 'optimal':
+			result.update({'verification_status': 'verified'})
+			result.update({'robustness_status': 'not_robust'})
+			result.update({'pointwise_robustness': result['optimal_value']})
+		else:
+			result.update({'verification_status': 'unverified'})
+			result.update({'robustness_status': 'unknown'})
+			result.update({'pointwise_robustness': 'unavailable'})
+
+		return result
