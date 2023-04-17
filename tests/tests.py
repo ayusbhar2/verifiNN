@@ -65,7 +65,7 @@ class TestNetwork(unittest.TestCase):
 		l = network.classify(x)
 		self.assertEqual(l, 1)
 
-class TestLPVerifier(unittest.TestCase):
+class TestLPVerifierInFeasible(unittest.TestCase):
 
 	W1 = np.array([[0.995, -0.100], [0.100, 0.995]])
 	b1 = np.array([-1, 0])
@@ -134,33 +134,10 @@ class TestLPVerifier(unittest.TestCase):
 		vf.generate_decision_variables()
 
 		obj = cp.Minimize(1)
-		result = vf._solve(self.network, self.x_0, self.epsilon, obj)
+		result = vf._solve(self.x_0, self.epsilon, obj)
 		self.assertEqual(result['problem_status'], 'infeasible')
 		self.assertEqual(result['optimal_value'], np.inf)
 		self.assertIsNone(result['adversarial_example'])
-
-	def test_solve_feasible(self):
-		W1 = np.array([[1, 0], [0, 1]])
-		b1 = np.array([1, 1])
-		W2 = np.array([[0, 1], [1, 0]])
-		b2 = np.array([2, 2])
-
-		weights = [W1, W2]
-		biases = [b1, b2]
-		network = Network(weights, biases, activation='ReLU')
-
-		epsilon = 1.5; x_0 = np.array([1, 2])
-
-		vf = LPVerifier()
-		vf.network = network
-		vf.generate_decision_variables()
-
-		obj = cp.Minimize(1)
-		result = vf._solve(network, x_0, epsilon, obj)
-		self.assertEqual(result['problem_status'], 'optimal')
-		self.assertEqual(result['optimal_value'], 1.0)
-		self.assertAlmostEqual(result['adversarial_example'][0], 1.0134037)
-		self.assertAlmostEqual(result['adversarial_example'][1], 0.6628437)
 
 	def test_verify_epsilon_robustness_infeasible(self):
 		vf = LPVerifier()
@@ -170,41 +147,71 @@ class TestLPVerifier(unittest.TestCase):
 		self.assertEqual(result['optimal_value'], np.inf)
 		self.assertIsNone(result['adversarial_example'])
 
-	def test_verify_epsilon_robustness_feasible(self):
-		W1 = np.array([[1, 0], [0, 1]])
-		b1 = np.array([1, 1])
-		W2 = np.array([[0, 1], [1, 0]])
-		b2 = np.array([2, 2])
+		self.assertEqual(result['verification_status'], 'unverified')
+		self.assertEqual(result['robustness_status'], 'unknown')
+		self.assertEqual(result['pointwise_robustness'], 'unavailable')
 
-		weights = [W1, W2]
-		biases = [b1, b2]
-		network = Network(weights, biases, activation='ReLU')
-
-		epsilon = 1.5; x_0 = np.array([1, 2])
-
+	def test_compute_pointwise_robustness_inf(self):
 		vf = LPVerifier()
-		result = vf.verify_epsilon_robustness(network, x_0, epsilon)
+		result = vf.verify_epsilon_robustness(
+			self.network, self.x_0, self.epsilon)
+		self.assertEqual(result['problem_status'], 'infeasible')
+		self.assertEqual(result['optimal_value'], np.inf)
+		self.assertIsNone(result['adversarial_example'])
+
+		self.assertEqual(result['verification_status'], 'unverified')
+		self.assertEqual(result['robustness_status'], 'unknown')
+		self.assertEqual(result['pointwise_robustness'], 'unavailable')
+
+
+class TestLPVerifierFeasible(unittest.TestCase):
+	W1 = np.array([[1, 0], [0, 1]])
+	b1 = np.array([1, 1])
+	W2 = np.array([[0, 1], [1, 0]])
+	b2 = np.array([2, 2])
+
+	weights = [W1, W2]
+	biases = [b1, b2]
+	network = Network(weights, biases, activation='ReLU')
+
+	epsilon = 1.5; x_0 = np.array([1, 2])
+
+	def test_solve_feasible(self):
+		vf = LPVerifier()
+		vf.network = self.network
+		vf.generate_decision_variables()
+
+		obj = cp.Minimize(1)
+		result = vf._solve(self.x_0, self.epsilon, obj)
 		self.assertEqual(result['problem_status'], 'optimal')
 		self.assertEqual(result['optimal_value'], 1.0)
 		self.assertAlmostEqual(result['adversarial_example'][0], 1.0134037)
 		self.assertAlmostEqual(result['adversarial_example'][1], 0.6628437)
 
-	def test_compute_pointwise_robustness_feasible(self):
-		W1 = np.array([[1, 0], [0, 1]])
-		b1 = np.array([1, 1])
-		W2 = np.array([[0, 1], [1, 0]])
-		b2 = np.array([2, 2])
-
-		weights = [W1, W2]
-		biases = [b1, b2]
-		network = Network(weights, biases, activation='ReLU')
-
-		epsilon = 1.5; x_0 = np.array([1, 2])
-
+	def test_verify_epsilon_robustness_feasible(self):
 		vf = LPVerifier()
-		result = vf.compute_pointwise_robustness(network, x_0, epsilon)
+		result = vf.verify_epsilon_robustness(
+			self.network, self.x_0, self.epsilon)
+		self.assertEqual(result['problem_status'], 'optimal')
+		self.assertEqual(result['optimal_value'], 1.0)
+		self.assertAlmostEqual(result['adversarial_example'][0], 1.0134037)
+		self.assertAlmostEqual(result['adversarial_example'][1], 0.6628437)
+
+		self.assertEqual(result['verification_status'], 'verified')
+		self.assertEqual(result['robustness_status'], 'not_robust')
+
+	def test_compute_pointwise_robustness_feasible(self):
+		vf = LPVerifier()
+		result = vf.compute_pointwise_robustness(
+			self.network, self.x_0, self.epsilon)
 		self.assertEqual(result['problem_status'], 'optimal')
 		self.assertAlmostEqual(result['optimal_value'], 0.5)
+		self.assertAlmostEqual(result['adversarial_example'][0], 1.5)
+		self.assertAlmostEqual(result['adversarial_example'][1], 1.5)
+
+		self.assertAlmostEqual(result['verification_status'], 'verified')
+		self.assertAlmostEqual(result['robustness_status'], 'not_robust')
+		self.assertAlmostEqual(result['pointwise_robustness'], 0.5)
 
 
 if __name__ == '__main__':
