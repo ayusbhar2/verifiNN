@@ -73,4 +73,4 @@ The adversarial example `(1.5, 1.5)` lies inside (actually, on the boundary of) 
 
 
 ## References:
-- [Verifying Neural Network Robustness with Lineear Programming](https://ayusbhar2.github.io/verifying-neural-nertwork-robustness-using-linear-programming/)
+- [Verifying Neural Network Robustness with Linear Programming](https://ayusbhar2.github.io/verifying-neural-nertwork-robustness-using-linear-programming/)
